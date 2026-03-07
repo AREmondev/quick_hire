@@ -15,7 +15,7 @@ module.exports = {
         xl: "60px",
       },
       screens: {
-        "2xl": "1560px",
+        "2xl": "1232px",
       },
     },
     extend: {
@@ -58,6 +58,9 @@ module.exports = {
           80: "#515B6F",
           100: "#25324B",
         },
+        border: {
+          DEFAULT: "#D6DDEB",
+        },
 
         /* ========================
            Light / Background
@@ -69,6 +72,7 @@ module.exports = {
       fontFamily: {
         clash: ["var(--font-display)"],
         epilogue: ["var(--font-epilogue)"],
+        inter: ["var(--font-inter)"],
       },
     },
   },

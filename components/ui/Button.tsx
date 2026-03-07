@@ -10,6 +10,7 @@ export const buttonVariants = cva(
       variant: {
         primary: "bg-primary !text-white h-[50px] px-6",
         transparent: "!text-primary bg-transparent text-black",
+        white: "bg-white !text-primary h-[50px] px-6",
       },
     },
 
@@ -20,7 +21,8 @@ export const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends ComponentPropsWithoutRef<"button">,
+  extends
+    ComponentPropsWithoutRef<"button">,
     VariantProps<typeof buttonVariants> {}
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -28,9 +30,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
-        className={cn(buttonVariants({ variant }), textVariants({
-          variant: "button"
-        }), className)}
+        className={cn(
+          buttonVariants({ variant }),
+          textVariants({
+            variant: "button",
+          }),
+          className,
+        )}
         {...props}
       />
     );
