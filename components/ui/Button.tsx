@@ -23,22 +23,36 @@ export const buttonVariants = cva(
 export interface ButtonProps
   extends
     ComponentPropsWithoutRef<"button">,
-    VariantProps<typeof buttonVariants> {}
+    VariantProps<typeof buttonVariants> {
+  isLoading?: boolean;
+}
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, ...props }, ref) => {
+  ({ className, variant, isLoading, disabled, children, ...props }, ref) => {
     return (
       <button
         ref={ref}
+        disabled={isLoading || disabled}
         className={cn(
           buttonVariants({ variant }),
           textVariants({
             variant: "button",
           }),
+          disabled && "opacity-70 cursor-not-allowed",
           className,
+          isLoading && "opacity-70 cursor-not-allowed",
         )}
         {...props}
-      />
+      >
+        {isLoading ? (
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span>Loading...</span>
+          </div>
+        ) : (
+          children
+        )}
+      </button>
     );
   },
 );

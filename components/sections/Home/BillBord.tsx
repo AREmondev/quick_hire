@@ -5,7 +5,7 @@ import React from "react";
 
 const BillBord = () => {
   return (
-    <div className="flex items-start py-18">
+    <div className="flex overflow-hidden items-start py-18">
       <div className="container relative bg-primary">
         <div className="h-[414px] w-full px-[70px]">
           <div className="max-w-[364px] flex flex-col gap-6 justify-center h-full">
@@ -20,7 +20,7 @@ const BillBord = () => {
             </Button>
           </div>
         </div>
-        <div className="absolute right-[70px] bottom-0">
+        <div className="absolute hidden lg:block right-[70px] bottom-0">
           <Image
             src="/assets/images/bashboard.png"
             width={570}

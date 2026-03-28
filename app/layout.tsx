@@ -7,6 +7,7 @@ import { Epilogue, Inter } from "next/font/google";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import Footer from "@/components/layout/Footer";
+import Providers from "./providers";
 config.autoAddCss = false;
 
 export const epilogue = Epilogue({
@@ -60,9 +61,12 @@ export default function RootLayout({
       <body
         className={`${clashDisplay.variable} ${epilogue.variable} ${inter.variable} antialiased bg-white w-full overflow-x-hidden`}
       >
-        <Navbar />
-        {children}
-        <Footer />
+        <Providers>
+          <Navbar />
+          {children}
+
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

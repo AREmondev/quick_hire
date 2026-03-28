@@ -1,41 +1,64 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Text, textVariants } from "@/components/ui/Text"; // Your Text component
+import { Text, textVariants } from "@/components/ui/Text";
 import { Button } from "@/components/ui/Button";
 
+const LOCATIONS = [
+  "Florence, Italy",
+  "Rome, Italy",
+  "Milan, Italy",
+  "Venice, Italy",
+  "Naples, Italy",
+  "Paris, France",
+  "Berlin, Germany",
+  "London, UK",
+  "New York, USA",
+  "Tokyo, Japan",
+  "Rajshahi, Bangladesh",
+  "Dhaka, Bangladesh",
+];
+
 export default function JobSearchBar() {
-  const [query, setQuery] = useState("");
+  const router = useRouter();
+  const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("");
   const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const locations = [
-    "Florence, Italy",
-    "Rome, Italy",
-    "Milan, Italy",
-    "Venice, Italy",
-    "Naples, Italy",
-    "Paris, France",
-    "Berlin, Germany",
-  ];
-
-  const filteredLocations = locations.filter((loc) =>
-    loc.toLowerCase().includes(query.toLowerCase()),
+  const filteredLocations = LOCATIONS.filter((loc) =>
+    loc.toLowerCase().includes(location.toLowerCase()),
   );
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (title) params.set("query", title);
+    if (location) params.set("location", location);
+    router.push(`/jobs?${params.toString()}`);
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
-    const handler = () => setOpen(false);
-    window.addEventListener("click", handler);
-    return () => window.removeEventListener("click", handler);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
-    <div className="flex flex-col gap-4 z-100">
-      <div className="flex items-center p-4 bg-white max-w-[857px]">
+    <div className="flex flex-col gap-4 z-[100]">
+      <div className="flex flex-col md:flex-row items-center p-2 md:p-4 bg-white max-w-[857px] shadow-sm">
         {/* Job title */}
-        <div className="flex items-center flex-auto gap-4 px-4 h-[57px]">
-          <span>
+        <div className="flex items-center flex-1 gap-4 px-4 h-[57px] w-full border-b md:border-b-0 md:border-r border-border">
+          <span className="shrink-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -64,18 +87,24 @@ export default function JobSearchBar() {
           <input
             placeholder="Job title or keyword"
             type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             className={cn(
               textVariants({
                 variant: "body_sm",
               }),
-              "outline-none flex-auto border-b border-border h-full flex items-center",
+              "outline-none focus:outline-none focus-visible:outline-none! focus:border-transparent flex-auto h-full flex items-center bg-transparent",
             )}
           />
         </div>
 
         {/* Location - Searchable Select */}
-        <div className="flex items-center flex-auto gap-4 px-4 h-[57px] relative">
-          <span>
+        <div
+          ref={dropdownRef}
+          className="flex items-center flex-1 gap-4 px-4 h-[57px] w-full relative"
+        >
+          <span className="shrink-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -104,33 +133,35 @@ export default function JobSearchBar() {
             </svg>
           </span>
 
-          <div className="flex h-full w-full items-center border-b border-border relative">
+          <div className="flex h-full w-full items-center relative">
             <input
-              placeholder="Florence, Italy"
+              placeholder="City, Country"
               type="text"
-              value={query}
+              value={location}
               onChange={(e) => {
-                setQuery(e.target.value);
+                setLocation(e.target.value);
                 setOpen(true);
               }}
-              onFocus={(e) => {
-                e.stopPropagation();
-                setOpen(true);
-              }}
+              onFocus={() => setOpen(true)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className={cn(
                 textVariants({
                   variant: "body_sm",
                 }),
-                "outline-none h-full flex-auto",
+                "outline-none focus-visible:outline-none! h-full flex-auto bg-transparent",
               )}
             />
-            <span>
+            <span className="cursor-pointer p-1" onClick={() => setOpen(!open)}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
                 height="16"
                 viewBox="0 0 16 16"
                 fill="none"
+                className={cn(
+                  "transition-transform duration-200",
+                  open && "rotate-180",
+                )}
               >
                 <path
                   d="M12.6666 5.6665L7.99992 10.3332L3.33325 5.6665"
@@ -144,16 +175,15 @@ export default function JobSearchBar() {
 
             {/* Dropdown */}
             {open && filteredLocations.length > 0 && (
-              <div className="absolute top-full left-0 mt-2 w-full bg-white border border-border rounded-md shadow-lg z-50">
+              <div className="absolute top-full left-[-40px] md:left-0 mt-2 w-[calc(100%+40px)] md:w-full bg-white border border-border rounded-md shadow-lg z-[110] max-h-[250px] overflow-y-auto">
                 {filteredLocations.map((loc) => (
                   <div
                     key={loc}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setQuery(loc);
+                    onClick={() => {
+                      setLocation(loc);
                       setOpen(false);
                     }}
-                    className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                    className="px-4 py-3 cursor-pointer hover:bg-light-gray transition-colors text-[14px] text-neutral-80"
                   >
                     {loc}
                   </div>
@@ -164,9 +194,14 @@ export default function JobSearchBar() {
         </div>
 
         {/* Search button */}
-        <Button className="h-[57px]">Search my job</Button>
+        <Button
+          onClick={handleSearch}
+          className="h-[57px] px-8 w-full md:w-auto mt-2 md:mt-0"
+        >
+          Search my job
+        </Button>
       </div>
-      <Text variant="body_sm" className="text-black">
+      <Text variant="body_sm" className="text-black hidden md:block">
         Popular :{" "}
         <span className="font-medium">
           UI Designer, UX Researcher, Android, Admin

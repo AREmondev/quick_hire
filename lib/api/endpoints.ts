@@ -1,0 +1,32 @@
+export const API_ENDPOINTS = {
+  AUTH: {
+    LOGIN: "/api/v1/auth/login",
+    REGISTER: "/api/v1/auth/register",
+  },
+  JOBS: {
+    PUBLIC_LIST: "/api/v1/jobs",
+    PUBLIC_DETAIL: (slug: string) => `/api/v1/jobs/${slug}`,
+    ADMIN_LIST: "/api/v1/jobs/admin/list",
+    ADMIN_CREATE: "/api/v1/jobs/admin",
+    ADMIN_DETAIL: (id: string) => `/api/v1/jobs/admin/${id}`,
+    ADMIN_PUBLISH: (id: string) => `/api/v1/jobs/admin/${id}/publish`,
+    ADMIN_UNPUBLISH: (id: string) => `/api/v1/jobs/admin/${id}/unpublish`,
+    APPLY: (jobId: string) => `/api/v1/jobs/${jobId}/applications`,
+    SAVE: (jobId: string) => `/api/v1/jobs/${jobId}/save`,
+  },
+  PROFILES: {
+    ME: "/api/v1/profiles/me",
+    RESUME: "/api/v1/profiles/me/resume",
+  },
+  APPLICATIONS: {
+    LIST: "/api/v1/applications",
+    DETAIL: (id: string) => `/api/v1/applications/${id}`,
+    SUBMIT: (id: string) => `/api/v1/applications/${id}/submit`,
+    ANSWER: (id: string) => `/api/v1/applications/${id}/answers`,
+  },
+  PUBLIC: {
+    CATEGORIES: "/api/v1/admin/categories",
+    EXPERIENCE_LEVELS: "/api/v1/experience-levels",
+    JOB_TYPES: "/api/v1/job-types",
+  },
+} as const;

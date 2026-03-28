@@ -60,7 +60,7 @@ export const jobCategories: {
 ];
 const Category = () => {
   return (
-    <section className="w-full pt-18">
+    <section className="w-full overflow-hidden pt-18">
       <div className="container">
         <div className=" flex flex-col gap-12">
           <div className="flex items-end gap-10 justify-between">
@@ -69,7 +69,7 @@ const Category = () => {
             </Text>
             <LinkButton href="/category">Show all jobs</LinkButton>
           </div>
-          <div className="grid grid-cols-4 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {jobCategories.map((item) => (
               <CtgCard key={item.category} category={item} />
             ))}

@@ -1,74 +1,113 @@
 "use client";
-import { useParams, useRouter } from "next/navigation";
+
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Text } from "@/components/ui/Text";
 import { Button } from "@/components/ui/Button";
-import { getApplication, updateApplication } from "@/lib/applications";
-import { ALL_JOBS } from "@/lib/jobs";
+import {
+  useCandidateApplicationQuery,
+  useSubmitApplicationMutation,
+} from "@/hooks/applications";
+import { ProfileSnapshotView } from "@/components/features/applications/ProfileSnapshotView";
+import { ApplicationStatus } from "@/services/types";
+import { useRouter } from "next/navigation";
 
-const TIMELINE = [
+const TIMELINE: {
+  key: ApplicationStatus | "decision";
+  label: string;
+  description: string;
+  icon: string;
+}[] = [
   {
     key: "assessment_pending",
     label: "Application Started",
-    description: "You started the application process and selected your resume source.",
+    description:
+      "You started the application process and selected your resume source.",
     icon: "📝",
-    alwaysDone: true,
   },
   {
     key: "assessment_completed",
     label: "Assessment Completed",
     description: "You completed the skills assessment for this position.",
     icon: "✅",
-    alwaysDone: false,
   },
   {
     key: "submitted",
     label: "Application Submitted",
     description: "Your full application has been submitted to the hiring team.",
     icon: "🚀",
-    alwaysDone: false,
   },
   {
     key: "under_review",
     label: "Under Review",
-    description: "The hiring team is reviewing your application and assessment results.",
+    description:
+      "The hiring team is reviewing your application and assessment results.",
     icon: "👀",
-    alwaysDone: false,
+  },
+  {
+    key: "interview",
+    label: "Interviewing",
+    description: "You have been invited for an interview.",
+    icon: "🤝",
   },
   {
     key: "decision",
     label: "Decision",
-    description: "A hiring decision will be communicated to you via email.",
+    description: "A hiring decision has been made for your application.",
     icon: "🎯",
-    alwaysDone: false,
   },
 ];
 
-const STATUS_ORDER = [
+const STATUS_ORDER: (ApplicationStatus | "decision")[] = [
+  "draft",
   "assessment_pending",
   "assessment_completed",
   "submitted",
   "under_review",
-  "decision",
+  "interview",
+  "offer",
+  "hired",
+  "rejected",
 ];
 
-export default function ApplicationStatusPage() {
+export default function ApplicationDetailsPage() {
   const params = useParams<{ id: string }>();
-  const router = useRouter();
-  const [app, setApp] = useState(() => getApplication(params.id));
-  const [submitting, setSubmitting] = useState(false);
+  const { data: session } = useSession();
 
-  if (!app) {
+  const {
+    data: app,
+    isLoading,
+    isError,
+  } = useCandidateApplicationQuery(params.id, session?.accessToken);
+  const submitApp = useSubmitApplicationMutation(app?.id || "");
+  const router = useRouter();
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-light-gray pt-[120px] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <Text variant="body_lg" className="text-neutral-60">
+            Loading application details...
+          </Text>
+        </div>
+      </main>
+    );
+  }
+
+  if (isError || !app) {
     return (
       <main className="min-h-screen bg-light-gray pt-[78px]">
         <div className="container py-20">
           <div className="max-w-md mx-auto bg-white border border-border p-12 text-center">
             <div className="text-5xl mb-4">😕</div>
-            <Text variant="title_lg" className="text-neutral-100 mb-2">Application Not Found</Text>
+            <Text variant="title_lg" className="text-neutral-100 mb-2">
+              Application Not Found
+            </Text>
             <Text variant="body_md" className="text-neutral-60 mb-6">
-              This application doesn&apos;t exist or may have been removed.
+              This application doesn&apos;t exist or you don&apos;t have access
+              to it.
             </Text>
             <Link href="/applications">
               <Button>Back to Applications</Button>
@@ -79,28 +118,36 @@ export default function ApplicationStatusPage() {
     );
   }
 
-  const job = ALL_JOBS.find((j) => j.slug === app.jobSlug);
   const currentStatusIdx = STATUS_ORDER.indexOf(app.status);
 
-  const submitApplication = async () => {
-    setSubmitting(true);
-    const updated = updateApplication(app.id, { status: "submitted" });
-    setApp(updated);
-    setTimeout(() => setSubmitting(false), 500);
+  const handleNextStep = async () => {
+    if (app.status === "draft") {
+      router.push(`/jobs/${app.jobSlug}/submit?applicationId=${app.id}`);
+    } else if (app.status === "assessment_pending") {
+      router.push(`/jobs/${app.jobSlug}/assessment?applicationId=${app.id}`);
+    } else if (app.status === "assessment_completed") {
+      try {
+        await submitApp.mutateAsync();
+        alert("Application submitted successfully!");
+      } catch (error) {
+        console.error("Failed to submit application:", error);
+        alert("Failed to submit application. Please try again.");
+      }
+    } else if (app.status === "draft") {
+      router.push(`/jobs/${app.jobSlug}/apply`);
+    }
   };
 
   const scorePercent = app.assessment?.total
     ? Math.round((app.assessment.score / app.assessment.total) * 100)
     : null;
 
-  const formatDate = (ts: number) =>
-    new Date(ts).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const filteredTimeline = TIMELINE.filter((step) => {
+    if (step.key === "assessment_completed") {
+      return !!app.job?.assessment;
+    }
+    return true;
+  });
 
   return (
     <main className="min-h-screen bg-light-gray pt-[78px]">
@@ -108,9 +155,16 @@ export default function ApplicationStatusPage() {
       <div className="bg-white border-b border-border">
         <div className="container py-4">
           <div className="flex items-center gap-2 text-[14px] text-neutral-60">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+            <Link href="/" className="hover:text-primary transition-colors">
+              Home
+            </Link>
             <span>›</span>
-            <Link href="/applications" className="hover:text-primary transition-colors">Applications</Link>
+            <Link
+              href="/applications"
+              className="hover:text-primary transition-colors"
+            >
+              Applications
+            </Link>
             <span>›</span>
             <span className="text-neutral-100">Status</span>
           </div>
@@ -123,45 +177,50 @@ export default function ApplicationStatusPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-5">
               <div className="w-16 h-16 border border-border flex items-center justify-center bg-light-gray shrink-0 overflow-hidden">
-                {job ? (
-                  <Image src={job.company_logo} alt={job.company_name} width={44} height={44} className="object-contain" />
+                {app.companyLogo ? (
+                  <Image
+                    src={app.companyLogo}
+                    alt={app.companyName || "Company logo"}
+                    width={44}
+                    height={44}
+                    className="object-contain"
+                  />
                 ) : (
-                  <div className="w-8 h-8 bg-neutral-20 flex items-center justify-center text-neutral-60 text-[20px] font-bold">
-                    {app.jobSlug.charAt(0).toUpperCase()}
+                  <div className="w-10 h-10 bg-neutral-20 flex items-center justify-center text-neutral-60 text-[20px] font-bold">
+                    {app.jobTitle?.charAt(0).toUpperCase() || "J"}
                   </div>
                 )}
               </div>
               <div>
                 <Text variant="h2" className="text-neutral-100">
-                  {job ? job.job_title : app.jobSlug}
+                  {app.jobTitle}
                 </Text>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  {job && (
-                    <Text variant="body_md" className="text-neutral-60 font-semibold">{job.company_name}</Text>
-                  )}
-                  {job && <div className="w-1 h-1 rounded-full bg-neutral-60" />}
+                  <Text
+                    variant="body_md"
+                    className="text-neutral-60 font-semibold"
+                  >
+                    {app.companyName}
+                  </Text>
+                  <div className="w-1 h-1 rounded-full bg-neutral-60" />
                   <Text variant="body_sm" className="text-neutral-60">
-                    Applied on {formatDate(app.createdAt)}
+                    Applied on{" "}
+                    {new Date(app.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </Text>
                 </div>
               </div>
             </div>
             <div className="flex gap-3 shrink-0">
-              {job && (
-                <Link href={`/jobs/${job.slug}`}>
+              {app.jobSlug && (
+                <Link href={`/jobs/${app.jobSlug}`}>
                   <button className="h-10 px-6 border border-border text-neutral-60 text-[14px] font-semibold hover:border-primary hover:text-primary transition-colors">
                     View Job
                   </button>
                 </Link>
-              )}
-              {app.status === "assessment_completed" && (
-                <Button
-                  onClick={submitApplication}
-                  disabled={submitting}
-                  className="h-10 px-6 disabled:opacity-60"
-                >
-                  {submitting ? "Submitting..." : "Submit Application"}
-                </Button>
               )}
             </div>
           </div>
@@ -170,38 +229,46 @@ export default function ApplicationStatusPage() {
 
       <div className="container py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main: timeline */}
-          <div className="lg:col-span-2 flex flex-col gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 flex flex-col gap-8">
             {/* Timeline */}
             <div className="bg-white border border-border p-8">
-              <Text variant="title_lg" className="text-neutral-100 mb-6">Application Timeline</Text>
-              <div className="flex flex-col gap-0">
-                {TIMELINE.map((step, idx) => {
-                  const stepIdx = STATUS_ORDER.indexOf(step.key);
-                  const isDone = step.alwaysDone || currentStatusIdx >= stepIdx;
-                  const isCurrent = currentStatusIdx === stepIdx;
-                  const isFuture = !isDone;
+              <Text variant="title_lg" className="text-neutral-100 mb-6">
+                Application Timeline
+              </Text>
+              <div className="flex flex-col">
+                {filteredTimeline.map((step, idx) => {
+                  const stepIdx = STATUS_ORDER.indexOf(
+                    step.key as ApplicationStatus,
+                  );
+                  const isDone = currentStatusIdx >= stepIdx || stepIdx === -1;
+                  const isCurrent = app.status === step.key;
+
                   return (
                     <div key={step.key} className="flex gap-5">
-                      {/* Left: indicator line */}
                       <div className="flex flex-col items-center">
                         <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center text-[18px] border-2 transition-all ${isDone
+                          className={`w-10 h-10 rounded-full flex items-center justify-center text-[18px] border-2 transition-all ${
+                            isDone
                               ? "border-primary bg-primary/10"
-                              : isCurrent
-                                ? "border-primary bg-white"
-                                : "border-neutral-20 bg-white"
-                            }`}
+                              : "border-neutral-20 bg-white"
+                          }`}
                         >
-                          {isDone ? step.icon : <div className="w-2 h-2 rounded-full bg-neutral-20" />}
+                          {isDone ? (
+                            step.icon
+                          ) : (
+                            <div className="w-2 h-2 rounded-full bg-neutral-20" />
+                          )}
                         </div>
-                        {idx < TIMELINE.length - 1 && (
-                          <div className={`w-px flex-1 min-h-8 my-1 ${isDone ? "bg-primary/30" : "bg-neutral-20"}`} />
+                        {idx < filteredTimeline.length - 1 && (
+                          <div
+                            className={`w-px flex-1 min-h-[40px] my-1 ${isDone ? "bg-primary/30" : "bg-neutral-20"}`}
+                          />
                         )}
                       </div>
-
-                      {/* Right: content */}
-                      <div className={`pb-6 pt-1 flex-1 ${idx === TIMELINE.length - 1 ? "pb-0" : ""}`}>
+                      <div
+                        className={`pb-8 flex-1 ${idx === filteredTimeline.length - 1 ? "pb-0" : ""}`}
+                      >
                         <div className="flex items-center gap-3 mb-1">
                           <Text
                             variant="body_md"
@@ -210,13 +277,12 @@ export default function ApplicationStatusPage() {
                             {step.label}
                           </Text>
                           {isCurrent && (
-                            <span className="px-2 py-0.5 bg-primary text-white text-[11px] font-bold">CURRENT</span>
-                          )}
-                          {isDone && !isCurrent && (
-                            <span className="px-2 py-0.5 bg-accent-green/10 text-accent-green text-[11px] font-bold">DONE</span>
+                            <span className="px-2 py-0.5 bg-primary text-white text-[11px] font-bold">
+                              CURRENT
+                            </span>
                           )}
                         </div>
-                        <Text variant="body_sm" className={isDone ? "text-neutral-60" : "text-neutral-60/50"}>
+                        <Text variant="body_sm" className="text-neutral-60">
                           {step.description}
                         </Text>
                       </div>
@@ -226,99 +292,165 @@ export default function ApplicationStatusPage() {
               </div>
             </div>
 
-            {/* Assessment results if available */}
+            {/* Assessment Results */}
             {app.assessment && (
               <div className="bg-white border border-border p-8">
-                <Text variant="title_lg" className="text-neutral-100 mb-6">Assessment Results</Text>
-                {app.assessment.total > 0 && (
-                  <div className="flex items-center gap-6 mb-6 p-5 bg-light-gray">
-                    <div className="flex flex-col items-center gap-1">
-                      <div
-                        className="text-[48px] font-bold leading-none"
-                        style={{ color: (scorePercent || 0) >= 70 ? "#56CDAD" : (scorePercent || 0) >= 40 ? "#FFB836" : "#FF6550" }}
-                      >
-                        {scorePercent}%
-                      </div>
-                      <Text variant="body_sm" className="text-neutral-60">Score</Text>
+                <Text variant="title_lg" className="text-neutral-100 mb-6">
+                  Assessment Results
+                </Text>
+                <div className="flex items-center gap-6 mb-8 p-6 bg-light-gray border border-border">
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="text-[48px] font-bold text-primary leading-none">
+                      {scorePercent}%
                     </div>
-                    <div className="flex-1">
-                      <Text variant="body_md" className="text-neutral-80 mb-2">
-                        {app.assessment.score} out of {app.assessment.total} multiple choice questions correct
-                      </Text>
-                      <div className="h-3 bg-neutral-20 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all"
-                          style={{
-                            width: `${scorePercent}%`,
-                            backgroundColor: (scorePercent || 0) >= 70 ? "#56CDAD" : (scorePercent || 0) >= 40 ? "#FFB836" : "#FF6550",
-                          }}
-                        />
-                      </div>
+                    <Text variant="body_sm" className="text-neutral-60">
+                      Score
+                    </Text>
+                  </div>
+                  <div className="flex-1">
+                    <Text variant="body_md" className="text-neutral-80 mb-2">
+                      You answered {app.assessment.score} out of{" "}
+                      {app.assessment.total} questions.
+                    </Text>
+                    <div className="h-2.5 bg-neutral-20 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary transition-all duration-1000"
+                        style={{ width: `${scorePercent}%` }}
+                      />
                     </div>
                   </div>
-                )}
+                </div>
 
-                {/* Answers summary */}
-                <div className="flex flex-col gap-3">
-                  {Object.entries(app.assessment.answers).map(([qid, answer]) => (
-                    <div key={qid} className="p-4 border border-border bg-light-gray">
-                      <Text variant="body_sm" className="text-neutral-60 mb-1 uppercase tracking-wide text-[11px] font-bold">{qid}</Text>
-                      <Text variant="body_md" className="text-neutral-100">
-                        {answer.length > 200 ? answer.slice(0, 200) + "..." : answer}
-                      </Text>
-                    </div>
-                  ))}
+                <div className="flex flex-col gap-4">
+                  <Text
+                    variant="body_md"
+                    className="font-bold text-neutral-100"
+                  >
+                    Your Answers
+                  </Text>
+                  {Object.entries(app.assessment.answers).map(
+                    ([question, answer]) => (
+                      <div
+                        key={question}
+                        className="p-5 border border-border bg-white shadow-sm"
+                      >
+                        <Text
+                          variant="body_sm"
+                          className="text-primary font-bold uppercase tracking-wider mb-2 text-[11px]"
+                        >
+                          Question
+                        </Text>
+                        <Text
+                          variant="body_md"
+                          className="text-neutral-100 font-semibold mb-4"
+                        >
+                          {question}
+                        </Text>
+                        <Text
+                          variant="body_sm"
+                          className="text-neutral-40 font-bold uppercase tracking-wider mb-2 text-[11px]"
+                        >
+                          Your Answer
+                        </Text>
+                        <div className="p-4 bg-light-gray border border-border text-neutral-80 text-[14px] leading-relaxed whitespace-pre-wrap">
+                          {answer as string}
+                        </div>
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
+            )}
+
+            {/* Profile Snapshot */}
+            {app.profileSnapshot && (
+              <ProfileSnapshotView profile={app.profileSnapshot} />
             )}
           </div>
 
           {/* Sidebar */}
-          <aside className="lg:col-span-1 flex flex-col gap-5">
-            {/* Quick details */}
+          <aside className="lg:col-span-1 flex flex-col gap-6">
+            {/* Next Step Card */}
+            {(app.status === "assessment_pending" ||
+              app.status === "assessment_completed") && (
+              <div className="bg-primary/5 border border-primary/20 p-6">
+                <Text variant="title_lg" className="text-primary mb-2">
+                  Next Step Required
+                </Text>
+                <Text variant="body_sm" className="text-neutral-60 mb-6">
+                  {app.status === "assessment_pending" &&
+                    "Please complete the skills assessment to proceed with your application."}
+                  {app.status === "assessment_completed" &&
+                    "Your assessment is done! Submit your application now for the hiring team to review."}
+                </Text>
+                <Button
+                  onClick={handleNextStep}
+                  isLoading={submitApp.isPending}
+                  className="w-full h-12 shadow-lg shadow-primary/20"
+                >
+                  {app.status === "assessment_pending" && "Take Assessment"}
+                  {app.status === "assessment_completed" &&
+                    "Submit Application"}
+                </Button>
+              </div>
+            )}
+
             <div className="bg-white border border-border p-6">
-              <Text variant="title_lg" className="text-neutral-100 mb-4">Application Details</Text>
+              <Text variant="title_lg" className="text-neutral-100 mb-4">
+                Application Summary
+              </Text>
               <div className="flex flex-col divide-y divide-border">
                 {[
-                  { label: "Application ID", value: app.id.slice(0, 20) + "..." },
                   { label: "Status", value: app.status.replace(/_/g, " ") },
-                  { label: "Resume Source", value: app.resumeSource === "pdf" ? "PDF Upload" : "Profile Data" },
-                  { label: "Applied On", value: new Date(app.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) },
-                  ...(job ? [{ label: "Company", value: job.company_name }, { label: "Location", value: job.location }] : []),
+                  {
+                    label: "Resume Source",
+                    value:
+                      app.resumeSource === "pdf"
+                        ? "PDF Upload"
+                        : "Profile Data",
+                  },
+                  {
+                    label: "Applied On",
+                    value: new Date(app.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    }),
+                  },
+                  {
+                    label: "Location",
+                    value: app.job?.location || "Remote",
+                  },
                 ].map((item) => (
-                  <div key={item.label} className="py-3 flex items-start justify-between gap-4">
-                    <Text variant="body_sm" className="text-neutral-60 shrink-0">{item.label}</Text>
-                    <Text variant="body_sm" className="text-neutral-100 text-right font-medium capitalize">{item.value}</Text>
+                  <div
+                    key={item.label}
+                    className="py-3 flex items-start justify-between gap-4"
+                  >
+                    <Text
+                      variant="body_sm"
+                      className="text-neutral-60 shrink-0"
+                    >
+                      {item.label}
+                    </Text>
+                    <Text
+                      variant="body_sm"
+                      className="text-neutral-100 text-right font-medium capitalize"
+                    >
+                      {item.value}
+                    </Text>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Tips */}
-            <div className="bg-primary/5 border border-primary/20 p-6">
-              <Text variant="body_md" className="text-primary font-semibold mb-3">💡 What happens next?</Text>
-              <div className="flex flex-col gap-2">
-                {[
-                  app.status === "assessment_pending" && "Complete your skills assessment to move forward.",
-                  app.status === "assessment_completed" && "Submit your application to send it to the hiring team.",
-                  app.status === "submitted" && "The hiring team is reviewing your application.",
-                ].filter(Boolean).map((tip, i) => (
-                  <Text key={i} variant="body_sm" className="text-neutral-80">• {tip}</Text>
-                ))}
-                <Text variant="body_sm" className="text-neutral-80">• Make sure your profile information is up to date.</Text>
-                <Text variant="body_sm" className="text-neutral-80">• Keep an eye on your email for updates.</Text>
-              </div>
-            </div>
-
-            {/* Navigation */}
             <div className="bg-white border border-border p-6 flex flex-col gap-3">
               <Link href="/applications" className="w-full">
-                <button className="w-full h-10 border border-border text-neutral-60 text-[14px] font-semibold hover:border-primary hover:text-primary transition-colors">
+                <button className="w-full h-11 border border-border text-neutral-60 text-[14px] font-semibold hover:border-primary hover:text-primary transition-colors">
                   ← All Applications
                 </button>
               </Link>
-              <Link href="/jobs">
-                <button className="w-full h-10 border border-border text-neutral-60 text-[14px] font-semibold hover:border-primary hover:text-primary transition-colors">
+              <Link href="/jobs" className="w-full">
+                <button className="w-full h-11 border border-border text-neutral-60 text-[14px] font-semibold hover:border-primary hover:text-primary transition-colors">
                   Browse More Jobs
                 </button>
               </Link>
