@@ -56,7 +56,7 @@ export default function SubmitPage({ params }: SubmitPageProps) {
     if (!applicationId || !session?.accessToken) return;
     setLoading(true);
     try {
-      await submitApplication(applicationId, session.accessToken);
+      await submitApplication(applicationId);
       setSubmitted(true);
 
       // Update steps to show completion

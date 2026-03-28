@@ -17,18 +17,35 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
   const { slug } = await params;
   let job: Job | null = null;
   try {
-    job = await serverFetch<Job>(API_ENDPOINTS.JOBS.PUBLIC_DETAIL(slug));
+    job = await serverFetch<Job>(API_ENDPOINTS.JOBS.PUBLIC_DETAIL(slug), {
+      next: { revalidate: 300 }, // Cache for 5 minutes
+    });
   } catch (error) {
     console.error("Failed to fetch job details:", error);
   }
 
   if (!job || !job.id) {
     return (
-      <main className="container pt-36 pb-20">
-        <Text variant="h2">Job not found</Text>
-        <Link href="/jobs">
-          <Button className="mt-6">Browse Jobs</Button>
-        </Link>
+      <main className="container pt-36 pb-20 text-center">
+        <div className="text-6xl mb-6">🔍</div>
+        <Text variant="h2" className="text-neutral-100 mb-2">
+          Job not found or connection issue
+        </Text>
+        <Text
+          variant="body_lg"
+          className="text-neutral-60 mb-8 max-w-md mx-auto"
+        >
+          We couldn't retrieve the details for this job. This might be due to a
+          temporary connection issue with our servers.
+        </Text>
+        <div className="flex items-center justify-center gap-4">
+          <Link href="/jobs">
+            <Button variant="transparent">Browse All Jobs</Button>
+          </Link>
+          <Link href={`/jobs/${slug}`}>
+            <Button>Try Again</Button>
+          </Link>
+        </div>
       </main>
     );
   }
@@ -71,7 +88,10 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
       <div className="fixed inset-x-0 bottom-0 lg:hidden bg-white border-t border-border p-4 z-50">
         <div className="container flex gap-3">
           {job.isApplied ? (
-            <Link href={`/applications/${job.applicationId}`} className="flex-1">
+            <Link
+              href={`/applications/${job.applicationId}`}
+              className="flex-1"
+            >
               <Button className="w-full bg-green-500 hover:bg-green-600 border-none">
                 View Application
               </Button>

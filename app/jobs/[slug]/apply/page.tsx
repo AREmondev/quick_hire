@@ -55,14 +55,10 @@ export default function ApplyPage({ params }: ApplyPageProps) {
     if (!job?.id || !session?.accessToken) return;
     setLoading(true);
     try {
-      const app = await createApplicationForJob(
-        job.id,
-        {
-          resumeSource,
-          resumeId: resumeSource === "pdf" ? profile?.resume?.id : null,
-        },
-        session.accessToken,
-      );
+      const app = await createApplicationForJob(job.id, {
+        resumeSource,
+        resumeId: resumeSource === "pdf" ? profile?.resume?.id : null,
+      });
 
       if (app?.id) {
         if (job.assessment) {

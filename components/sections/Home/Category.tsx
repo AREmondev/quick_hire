@@ -1,7 +1,7 @@
 import LinkButton from "@/components/ui/LinkButton";
 import { Text } from "@/components/ui/Text";
 import React from "react";
-import { BsLaptop } from "react-icons/bs";
+import { BsLaptop, BsDatabase } from "react-icons/bs";
 import { FaBusinessTime } from "react-icons/fa";
 import type { IconType } from "react-icons";
 import { FcSalesPerformance } from "react-icons/fc";
@@ -12,53 +12,29 @@ import {
   MdOutlineDesignServices,
   MdOutlineEngineering,
 } from "react-icons/md";
-export const jobCategories: {
-  category: string;
-  jobs: number;
-  icon: IconType;
-}[] = [
-  {
-    category: "Design",
-    jobs: 235,
-    icon: MdOutlineDesignServices,
-  },
-  {
-    category: "Sales",
-    jobs: 756,
-    icon: FcSalesPerformance,
-  },
-  {
-    category: "Marketing",
-    jobs: 140,
-    icon: MdOutlineCampaign,
-  },
-  {
-    category: "Finance",
-    jobs: 325,
-    icon: MdOutlineAttachMoney,
-  },
-  {
-    category: "Technology",
-    jobs: 436,
-    icon: BsLaptop,
-  },
-  {
-    category: "Engineering",
-    jobs: 542,
-    icon: MdOutlineEngineering,
-  },
-  {
-    category: "Business",
-    jobs: 211,
-    icon: FaBusinessTime,
-  },
-  {
-    category: "Human Resource",
-    jobs: 346,
-    icon: HiOutlineUserGroup,
-  },
-];
-const Category = () => {
+
+import { Category as CategoryType } from "@/services/types";
+import { getCategories } from "@/services/serverApi";
+
+const categoryIconMap: Record<string, IconType> = {
+  design: MdOutlineDesignServices,
+  sales: FcSalesPerformance,
+  marketing: MdOutlineCampaign,
+  finance: MdOutlineAttachMoney,
+  technology: BsLaptop,
+  engineering: MdOutlineEngineering,
+  business: FaBusinessTime,
+  "human-resource": HiOutlineUserGroup,
+  "human-resources": HiOutlineUserGroup,
+  "software-development": BsLaptop,
+  "data-science": BsDatabase,
+  "customer-success": FaBusinessTime,
+  "product-management": MdOutlineCampaign,
+};
+
+const Category = async () => {
+  const categories = await getCategories();
+
   return (
     <section className="w-full overflow-hidden pt-18">
       <div className="container">
@@ -67,13 +43,12 @@ const Category = () => {
             <Text variant={"h2"} fontFamily={"clash"}>
               Explore by <span className="text-accent-blue">category</span>
             </Text>
-            <LinkButton href="/category">Show all jobs</LinkButton>
+            <LinkButton href="/jobs">Show all jobs</LinkButton>
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {jobCategories.map((item) => (
-              <CtgCard key={item.category} category={item} />
+            {categories.map((item) => (
+              <CtgCard key={item.id} category={item} />
             ))}
-            {/* <CtgCard category="Design" /> */}
           </div>
         </div>
       </div>
@@ -81,19 +56,11 @@ const Category = () => {
   );
 };
 
-const CtgCard = ({
-  category,
-}: {
-  category: {
-    category: string;
-    jobs: number;
-    icon: IconType;
-  };
-}) => {
-  const Icon = category.icon;
+const CtgCard = ({ category }: { category: CategoryType }) => {
+  const Icon = categoryIconMap[category.slug] || MdOutlineCampaign;
 
   return (
-    <div className="group flex flex-col gap-8 p-8 border border-neutral-20 hover:bg-primary transition-colors">
+    <div className="group flex flex-col gap-8 p-8 border border-neutral-20 hover:bg-primary transition-colors cursor-pointer">
       <Icon className="text-[48px] text-primary group-hover:text-white" />
       <div className="flex flex-col gap-3">
         <Text
@@ -101,7 +68,7 @@ const CtgCard = ({
           fontFamily={"clash"}
           className="text-neutral-100 group-hover:text-white"
         >
-          {category.category}
+          {category.name}
         </Text>
 
         <div className="flex items-center gap-4">
@@ -109,7 +76,7 @@ const CtgCard = ({
             variant={"body_lg"}
             className="text-neutral-60 group-hover:text-white"
           >
-            {category.jobs} jobs available
+            {category.jobCount || 0} jobs available
           </Text>
 
           <span className="text-neutral-100 group-hover:text-white">

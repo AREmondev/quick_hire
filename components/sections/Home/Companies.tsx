@@ -15,7 +15,7 @@ const Companies = async () => {
           <Text variant="body_lg" className="text-black/50">
             Companies we helped grow
           </Text>
-          <div className="flex  w-full items-cneter justify-center  md::justify-between flex-wrap gap-10 items-center">
+          <div className="flex  w-full items-cneter justify-center  md:justify-between flex-wrap gap-10 items-center">
             {companies.map(
               (item) =>
                 item.logoUrl && (

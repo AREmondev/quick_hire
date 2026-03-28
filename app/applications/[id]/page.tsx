@@ -133,8 +133,6 @@ export default function ApplicationDetailsPage() {
         console.error("Failed to submit application:", error);
         alert("Failed to submit application. Please try again.");
       }
-    } else if (app.status === "draft") {
-      router.push(`/jobs/${app.jobSlug}/apply`);
     }
   };
 
@@ -372,6 +370,7 @@ export default function ApplicationDetailsPage() {
           <aside className="lg:col-span-1 flex flex-col gap-6">
             {/* Next Step Card */}
             {(app.status === "assessment_pending" ||
+              app.status === "draft" ||
               app.status === "assessment_completed") && (
               <div className="bg-primary/5 border border-primary/20 p-6">
                 <Text variant="title_lg" className="text-primary mb-2">
@@ -391,6 +390,7 @@ export default function ApplicationDetailsPage() {
                   {app.status === "assessment_pending" && "Take Assessment"}
                   {app.status === "assessment_completed" &&
                     "Submit Application"}
+                  {app.status === "draft" && "Submit Applications"}
                 </Button>
               </div>
             )}

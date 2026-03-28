@@ -1,12 +1,12 @@
 export type Role = "candidate" | "employer" | "admin";
 
 export interface JobType {
-  id: string;
+  _id: string;
   name: string;
 }
 
 export interface ExperienceLevel {
-  id: string;
+  _id: string;
   name: string;
 }
 

@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import dynamic from "next/dynamic";
 import { clashDisplay } from "@/lib/fonts";
 import { Epilogue, Inter } from "next/font/google";
 // Font Awesome
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import Footer from "@/components/layout/Footer";
 import Providers from "./providers";
+
+const Footer = dynamic(() => import("@/components/layout/Footer"));
 config.autoAddCss = false;
 
 export const epilogue = Epilogue({

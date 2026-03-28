@@ -17,11 +17,12 @@ export const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString();
 };
 
-export const calculateDaysAgo = (dateString: string) => {
-  if (!dateString) return "N/A";
-  const postedDate = new Date(dateString);
+export const calculateDaysAgo = (dateTimestamp: string) => {
+  console.log("dateTimestamp", dateTimestamp);
+  if (!dateTimestamp) return "N/A";
+  const date = new Date(dateTimestamp);
   const today = new Date();
-  const diffTime = today.getTime() - postedDate.getTime();
+  const diffTime = today.getTime() - date.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return `${diffDays}`;
 };

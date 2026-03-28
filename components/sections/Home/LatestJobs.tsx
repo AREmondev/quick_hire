@@ -2,6 +2,7 @@ import { Badge, OutlineBadge } from "@/components/ui/Badge";
 import LinkButton from "@/components/ui/LinkButton";
 import { Text } from "@/components/ui/Text";
 import { categoryColors } from "@/lib/jobs";
+import { calculateDaysAgo } from "@/lib/utils";
 import { getJobs } from "@/services/serverApi";
 import Image from "next/image";
 import Link from "next/link";
@@ -54,9 +55,9 @@ const LatestJobs = async () => {
                       </Text>
                       <div className="h-1 w-1 rounded-full bg-neutral-80"></div>
                       <Text variant={"body_sm"} className="text-neutral-60">
-                        {job.postedDaysAgo === 0
+                        {calculateDaysAgo(job?.postedAt || "") == "0"
                           ? "Today"
-                          : `${job.postedDaysAgo} days ago`}
+                          : `${calculateDaysAgo(job?.postedAt || "")} days ago`}
                       </Text>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">

@@ -6,15 +6,16 @@ import { Text, textVariants } from "@/components/ui/Text";
 import Image from "next/image";
 import { IMAGES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { useMemo, useState, useRef, useEffect } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useMemo, useState, useRef, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import type { User } from "@/lib/api/types";
-import {
-  BsChevronDown,
-  BsBoxArrowRight,
-  BsPerson,
-  BsBriefcase,
-} from "react-icons/bs";
+import { BsChevronDown } from "react-icons/bs";
+import dynamic from "next/dynamic";
+
+const ProfileDropdown = dynamic(() => import("./ProfileDropdown"), {
+  ssr: false,
+});
+const MobileMenu = dynamic(() => import("./MobileMenu"), { ssr: false });
 
 const NAV_LINKS = [
   { href: "/jobs", label: "Find Jobs" },
@@ -36,6 +37,11 @@ const Navbar = () => {
     const last = parts[1]?.[0] || "";
     return (first + last).toUpperCase() || "U";
   }, [user]);
+
+  const toggleProfile = useCallback(() => setProfileOpen((prev) => !prev), []);
+  const toggleMobile = useCallback(() => setMobileOpen((prev) => !prev), []);
+  const closeProfile = useCallback(() => setProfileOpen(false), []);
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
 
   // Handle click outside to close profile dropdown
   useEffect(() => {
@@ -107,7 +113,7 @@ const Navbar = () => {
           ) : (
             <div className="relative" ref={profileRef}>
               <button
-                onClick={() => setProfileOpen(!profileOpen)}
+                onClick={toggleProfile}
                 className="flex items-center gap-3 group focus:outline-none"
               >
                 <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-semibold shadow-sm group-hover:bg-primary-dark transition-colors">
@@ -136,50 +142,7 @@ const Navbar = () => {
 
               {/* Profile Dropdown */}
               {profileOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-border rounded-lg shadow-xl overflow-hidden py-2 animate-slideDown">
-                  <div className="px-4 py-3 border-b border-border bg-light-gray/30">
-                    <Text variant="body_sm" className="text-neutral-60 block">
-                      Logged in as
-                    </Text>
-                    <Text
-                      variant="body_md"
-                      className="text-neutral-100 font-bold truncate"
-                    >
-                      {user.email}
-                    </Text>
-                  </div>
-
-                  <Link
-                    href="/profile"
-                    onClick={() => setProfileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-neutral-60 hover:text-primary hover:bg-primary/5 transition-colors"
-                  >
-                    <BsPerson className="text-lg" />
-                    <span className="font-medium">My Profile</span>
-                  </Link>
-
-                  <Link
-                    href="/applications"
-                    onClick={() => setProfileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-neutral-60 hover:text-primary hover:bg-primary/5 transition-colors"
-                  >
-                    <BsBriefcase className="text-lg" />
-                    <span className="font-medium">My Applications</span>
-                  </Link>
-
-                  <div className="h-px bg-border my-1" />
-
-                  <button
-                    onClick={() => {
-                      setProfileOpen(false);
-                      signOut({ callbackUrl: "/" });
-                    }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-accent-red hover:bg-accent-red/5 transition-colors"
-                  >
-                    <BsBoxArrowRight className="text-lg" />
-                    <span className="font-bold">Logout</span>
-                  </button>
-                </div>
+                <ProfileDropdown user={user} onClose={closeProfile} />
               )}
             </div>
           )}
@@ -187,87 +150,40 @@ const Navbar = () => {
 
         {/* Mobile hamburger */}
         <button
-          onClick={() => setMobileOpen(!mobileOpen)}
+          onClick={toggleMobile}
           className="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5"
           aria-label="Toggle menu"
         >
           <span
-            className={`w-6 h-0.5 bg-neutral-100 transition-all ${
-              mobileOpen ? "rotate-45 translate-y-2" : ""
-            }`}
+            className={cn(
+              "w-6 h-0.5 bg-neutral-100 transition-all",
+              mobileOpen && "rotate-45 translate-y-2",
+            )}
           />
           <span
-            className={`w-6 h-0.5 bg-neutral-100 transition-all ${
-              mobileOpen ? "opacity-0" : ""
-            }`}
+            className={cn(
+              "w-6 h-0.5 bg-neutral-100 transition-all",
+              mobileOpen && "opacity-0",
+            )}
           />
           <span
-            className={`w-6 h-0.5 bg-neutral-100 transition-all ${
-              mobileOpen ? "-rotate-45 -translate-y-2" : ""
-            }`}
+            className={cn(
+              "w-6 h-0.5 bg-neutral-100 transition-all",
+              mobileOpen && "-rotate-45 -translate-y-2",
+            )}
           />
         </button>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-border animate-slideDown">
-          <div className="container py-4 flex flex-col gap-1">
-            {NAV_LINKS.map((link) => {
-              const isActive =
-                pathname === link.href || pathname.startsWith(link.href + "/");
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={cn(
-                    "px-4 py-3 font-medium text-[15px] transition-colors",
-                    isActive ? "text-primary bg-primary/5" : "text-neutral-60",
-                  )}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-            {!user ? (
-              <div className="flex gap-3 mt-4 pt-4 border-t border-border">
-                <Link href="/auth/login" className="flex-1">
-                  <Button variant="transparent" className="w-full">
-                    Login
-                  </Button>
-                </Link>
-                <Link href="/auth/register" className="flex-1">
-                  <Button className="w-full">Sign Up</Button>
-                </Link>
-              </div>
-            ) : (
-              <Link
-                href="/profile"
-                onClick={() => setMobileOpen(false)}
-                className="mt-4 pt-4 border-t border-border flex items-center gap-3 px-4 py-3"
-              >
-                <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold">
-                  {initials}
-                </div>
-                <span className="text-neutral-100 font-semibold">
-                  {user.name}
-                </span>
-              </Link>
-            )}
-            {user && (
-              <button
-                onClick={() => {
-                  setMobileOpen(false);
-                  signOut({ callbackUrl: "/" });
-                }}
-                className="px-4 py-3 font-medium text-[15px] text-accent-red hover:bg-accent-red/5 transition-colors text-left"
-              >
-                Logout
-              </button>
-            )}
-          </div>
-        </div>
+        <MobileMenu
+          navLinks={NAV_LINKS}
+          pathname={pathname}
+          user={user}
+          initials={initials}
+          onClose={closeMobile}
+        />
       )}
     </header>
   );

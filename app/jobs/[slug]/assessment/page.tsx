@@ -81,11 +81,7 @@ export default function AssessmentPage({ params }: AssessmentPageProps) {
           answer,
         })),
       };
-      await submitCandidateApplication(
-        applicationId,
-        session.accessToken,
-        formattedAnswers,
-      );
+      await submitCandidateApplication(applicationId, formattedAnswers);
       router.push(`/jobs/${slug}/submit?applicationId=${applicationId}`);
     } catch (error) {
       console.error("Failed to submit application:", error);
