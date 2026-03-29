@@ -11,6 +11,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { serverFetch } from "@/lib/api/serverFetch";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import { Category, ExperienceLevel, JobType } from "@/services/types";
+import Loading from "@/components/ui/Loading";
 
 const SORT_OPTIONS = [
   { label: "Newest", value: "postedAt:desc" },
@@ -84,7 +85,14 @@ function JobsPageContent() {
     setSortBy("postedAt:desc");
     setPage(1);
   };
-
+  console.log("isLoading", isLoading);
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-light-gray pt-[78px]">
+        <Loading variant="section" text="Searching for jobs..." />
+      </main>
+    );
+  }
   return (
     <main className="min-h-screen bg-light-gray pt-[78px] pb-20">
       {/* Page Header */}
@@ -191,7 +199,9 @@ function JobsPageContent() {
 
 export default function JobsPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={<Loading variant="full" text="Initializing jobs portal..." />}
+    >
       <JobsPageContent />
     </Suspense>
   );

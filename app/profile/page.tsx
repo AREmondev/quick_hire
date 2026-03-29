@@ -9,6 +9,7 @@ import {
 } from "@/hooks/profile";
 import type { Profile } from "@/services/types";
 import { ProfileHeader } from "@/components/features/profile/ProfileHeader";
+import Loading from "@/components/ui/Loading";
 import { ProfileSidebar } from "@/components/features/profile/ProfileSidebar";
 import { BasicInfoSection } from "@/components/features/profile/BasicInfoSection";
 import { SummarySection } from "@/components/features/profile/SummarySection";
@@ -37,7 +38,7 @@ export default function ProfilePage() {
 
   const canSave = useMemo(
     () => !!(profile?.name && profile?.title && profile?.email),
-    [profile]
+    [profile],
   );
 
   const save = async () => {
@@ -69,10 +70,8 @@ export default function ProfilePage() {
 
   if (isLoading || !profile) {
     return (
-      <main className="min-h-screen bg-light-gray pt-[78px] flex items-center justify-center">
-        <Text variant="body_lg" className="text-neutral-60">
-          Loading profile...
-        </Text>
+      <main className="min-h-screen bg-light-gray pt-[78px]">
+        <Loading variant="section" text="Loading your profile..." />
       </main>
     );
   }

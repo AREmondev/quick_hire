@@ -4,16 +4,15 @@ import Link from "next/link";
 import { Text } from "@/components/ui/Text";
 import { useMyProfileQuery } from "@/hooks/profile";
 import { Button } from "@/components/ui/Button";
+import Loading from "@/components/ui/Loading";
 
 export default function ResumePage() {
   const { data: p, isLoading } = useMyProfileQuery();
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-light-gray pt-[78px] flex items-center justify-center">
-        <Text variant="body_lg" className="text-neutral-60">
-          Loading resume...
-        </Text>
+      <main className="min-h-screen bg-light-gray pt-[78px]">
+        <Loading variant="section" text="Generating your resume preview..." />
       </main>
     );
   }
@@ -125,7 +124,7 @@ export default function ResumePage() {
                   p.phone ? { icon: "📱", val: p.phone } : null,
                 ]
                   .filter((item): item is { icon: string; val: string } =>
-                    Boolean(item)
+                    Boolean(item),
                   )
                   .map((item) => (
                     <span

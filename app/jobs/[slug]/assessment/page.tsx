@@ -13,6 +13,7 @@ import { AssessmentQuestionItem } from "@/components/features/jobs/AssessmentQue
 import { AssessmentFooter } from "@/components/features/jobs/AssessmentFooter";
 import { usePublicJobQuery } from "@/hooks/jobs";
 import { AssessmentQuestion } from "@/services/types";
+import Loading from "@/components/ui/Loading";
 
 interface AssessmentPageProps {
   params: Promise<{ slug: string }>;
@@ -92,13 +93,8 @@ export default function AssessmentPage({ params }: AssessmentPageProps) {
 
   if (jobLoading || appLoading) {
     return (
-      <main className="min-h-screen bg-light-gray pt-[120px] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <Text variant="body_lg" className="text-neutral-60">
-            Loading assessment...
-          </Text>
-        </div>
+      <main className="min-h-screen bg-light-gray pt-[120px]">
+        <Loading variant="section" text="Loading assessment..." />
       </main>
     );
   }

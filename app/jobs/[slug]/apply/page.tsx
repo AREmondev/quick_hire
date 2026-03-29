@@ -13,6 +13,7 @@ import { InfoBanner } from "@/components/features/jobs/InfoBanner";
 import { ResumeSourceSelection } from "@/components/features/jobs/ResumeSourceSelection";
 import { ApplyActions } from "@/components/features/jobs/ApplyActions";
 import { usePublicJobQuery } from "@/hooks/jobs";
+import Loading from "@/components/ui/Loading";
 
 interface ApplyPageProps {
   params: Promise<{ slug: string }>;
@@ -76,10 +77,8 @@ export default function ApplyPage({ params }: ApplyPageProps) {
 
   if (jobLoading || profileLoading) {
     return (
-      <main className="min-h-screen bg-light-gray pt-[120px] flex items-center justify-center">
-        <Text variant="body_lg" className="text-neutral-60">
-          Loading...
-        </Text>
+      <main className="min-h-screen bg-light-gray pt-[120px]">
+        <Loading variant="section" text="Setting up your application..." />
       </main>
     );
   }

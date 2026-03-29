@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { useSession } from "next-auth/react";
 import { useCandidateApplicationsQuery } from "@/hooks/applications";
 import { ApplicationStatus } from "@/services/types";
+import Loading from "@/components/ui/Loading";
 
 const statusConfig: Record<
   ApplicationStatus,
@@ -132,10 +133,8 @@ export default function ApplicationsPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-light-gray pt-[78px] flex items-center justify-center">
-        <Text variant="body_lg" className="text-neutral-60">
-          Loading applications...
-        </Text>
+      <main className="min-h-screen bg-light-gray pt-[78px]">
+        <Loading variant="section" text="Loading your applications..." />
       </main>
     );
   }

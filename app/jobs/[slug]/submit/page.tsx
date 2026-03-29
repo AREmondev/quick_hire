@@ -10,6 +10,7 @@ import { submitApplication } from "@/services/applications";
 import { ProgressSteps } from "@/components/features/jobs/ProgressSteps";
 import { usePublicJobQuery } from "@/hooks/jobs";
 import { BsCheckCircle } from "react-icons/bs";
+import Loading from "@/components/ui/Loading";
 
 interface SubmitPageProps {
   params: Promise<{ slug: string }>;
@@ -81,10 +82,8 @@ export default function SubmitPage({ params }: SubmitPageProps) {
 
   if (jobLoading || appLoading) {
     return (
-      <main className="min-h-screen bg-light-gray pt-[120px] flex items-center justify-center">
-        <Text variant="body_lg" className="text-neutral-60">
-          Loading...
-        </Text>
+      <main className="min-h-screen bg-light-gray pt-[120px]">
+        <Loading variant="section" text="Preparing your application..." />
       </main>
     );
   }

@@ -13,6 +13,7 @@ import {
 import { ProfileSnapshotView } from "@/components/features/applications/ProfileSnapshotView";
 import { ApplicationStatus } from "@/services/types";
 import { useRouter } from "next/navigation";
+import Loading from "@/components/ui/Loading";
 
 const TIMELINE: {
   key: ApplicationStatus | "decision";
@@ -85,13 +86,8 @@ export default function ApplicationDetailsPage() {
   const router = useRouter();
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-light-gray pt-[120px] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <Text variant="body_lg" className="text-neutral-60">
-            Loading application details...
-          </Text>
-        </div>
+      <main className="min-h-screen bg-light-gray pt-[120px]">
+        <Loading variant="section" text="Loading application details..." />
       </main>
     );
   }
