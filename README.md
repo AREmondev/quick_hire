@@ -1,44 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QuickHire Frontend 🚀
 
-## Getting Started
+Welcome to the **QuickHire Frontend**, a modern, high-performance job search and application platform. Built with **Next.js 15 (App Router)** and **React 19**, it provides a seamless and intuitive experience for candidates and employers.
 
-First, run the development server:
+---
 
+## 🌍 Live Application & Demo
+- **Main Application:** [https://quick-hire-green.vercel.app](https://quick-hire-green.vercel.app)
+- **Admin Dashboard:** [https://quickhire-dashboard.vercel.app/](https://quickhire-dashboard.vercel.app/)
+
+### 🔑 Demo Credentials
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| **Admin** | `emon.admin@gmail.com` | `password1!` |
+| **Admin** | `emon.admin1@gmail.com` | `password1!` |
+| **User** | `emon.emon@gmail.com` | `password1!` |
+
+*You can also register and create a new user directly on the platform.*
+
+---
+
+## 🛠 Technical Stack
+
+### **Core Frameworks**
+- **Framework:** Next.js 15 (App Router)
+- **Library:** React 19
+- **State Management:** TanStack Query v5 (React Query)
+- **Authentication:** NextAuth.js
+- **Styling:** Tailwind CSS 4 with Class Variance Authority (CVA)
+- **API Client:** Axios with centralized interceptors
+
+### **UI & Experience**
+- **Icons:** React Icons & FontAwesome
+- **Animations:** Framer Motion
+- **Components:** Custom reusable UI components with focus on accessibility and responsiveness.
+
+---
+
+## 🚀 Performance & Architecture
+
+QuickHire is engineered for speed and a smooth user experience. We've achieved high Lighthouse scores through several key strategies:
+
+### **1. Server Components (RSC) Usage**
+We heavily leverage **React Server Components** for critical parts of the application:
+- **Why?** By fetching data on the server, we reduce the amount of JavaScript sent to the client, leading to faster initial page loads and improved SEO.
+- **Where?** The Home page sections (Hero, Category, Featured Jobs, etc.) are rendered on the server, ensuring content is visible immediately.
+
+### **2. Advanced Code Splitting & Lazy Loading**
+- **`next/dynamic`:** Below-the-fold components like `Companies`, `FeaturedJobs`, and `LatestJobs` are loaded dynamically only when needed.
+- **Suspense:** Wrapped dynamic components in `Suspense` with lightweight pulse fallbacks to maintain layout stability during loading.
+
+### **3. LCP & Image Optimization**
+- **`next/image`:** Used for automatic image optimization and lazy loading.
+- **Priority Loading:** Above-the-fold images in the Hero section use the `priority` attribute to boost Largest Contentful Paint (LCP) performance.
+- **SVG Optimization:** Large inline SVGs were extracted into separate components to keep the HTML payload small and maintainable.
+
+### **4. TBT & Main-Thread Optimization**
+- **Memoization:** Used `useMemo` and `useCallback` for complex UI logic (like the Job Search Bar) to prevent unnecessary re-renders and main-thread blocking.
+- **Dynamic Hydration:** Non-critical UI elements like the profile dropdown and mobile menu are hydrated on demand.
+
+---
+
+## 🏁 Getting Started
+
+### Prerequisites
+- **Node.js** v20+
+- **npm** or **yarn**
+
+### 1. Installation
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Environment Setup
+Create a `.env.local` file:
+```env
+NEXT_PUBLIC_BACKEND_URL=https://job-backend-0q3q.onrender.com
+NEXTAUTH_SECRET=your_secret
+NEXTAUTH_URL=http://localhost:3000
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Build & Run
+```bash
+# Development
+npm run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Production Build
+npm run build
 
-## Learn More
+# Start Production
+npm run start
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📜 License
+This project is licensed under the MIT License.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# nanoclaw
-# nanoclaw
-# nanoclaw
-# job_backend
-# job_backend
-# quick_hire
-# quick_hire
-# quick_hire
+---
+*Developed with ❤️ by the AREmon*
