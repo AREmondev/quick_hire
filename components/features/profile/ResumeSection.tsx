@@ -9,7 +9,11 @@ interface ResumeSectionProps {
   onRemove: () => void;
 }
 
-export function ResumeSection({ profile, onUpload, onRemove }: ResumeSectionProps) {
+export function ResumeSection({
+  profile,
+  onUpload,
+  onRemove,
+}: ResumeSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,16 +63,16 @@ export function ResumeSection({ profile, onUpload, onRemove }: ResumeSectionProp
         ) : (
           <div
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-neutral-20 hover:border-primary p-12 text-center cursor-pointer transition-colors group"
+            className="border-2 flex flex-col items-center border-dashed border-neutral-20 hover:border-primary p-12 text-center cursor-pointer transition-colors group"
           >
             <div className="text-4xl mb-3">📎</div>
             <Text
               variant="body_lg"
-              className="font-semibold text-neutral-100 mb-1"
+              className="font-semibold text-cneter text-neutral-100 mb-1"
             >
               Click to upload your PDF resume
             </Text>
-            <Text variant="body_sm" className="text-neutral-60">
+            <Text variant="body_sm" className="text-neutral-60 text-cneter">
               PDF format • Max 10MB
             </Text>
           </div>

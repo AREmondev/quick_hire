@@ -8,6 +8,7 @@ Welcome to the **QuickHire Frontend**, a modern, high-performance job search and
 
 - **Main Application:** [https://quick-hire-green.vercel.app](https://quick-hire-green.vercel.app)
 - **Admin Dashboard:** [https://quickhire-dashboard.vercel.app/](https://quickhire-dashboard.vercel.app/)
+- **Lighthouse Performance Report:** [View PDF Report](/lighthouse.pdf)
 
 ### 🔑 Demo Credentials
 
@@ -37,6 +38,40 @@ _You can also register and create a new user directly on the platform._
 - **Icons:** React Icons & FontAwesome
 - **Animations:** Framer Motion
 - **Components:** Custom reusable UI components with focus on accessibility and responsiveness.
+
+---
+
+## 🏗 Architecture & Technical Implementation
+
+QuickHire is built with a robust and scalable architecture that separates concerns across different layers.
+
+### **1. Component Structure**
+
+- **`app/`**: Next.js App Router for file-based routing and Server Components.
+- **`components/ui/`**: Atomic, reusable UI elements (Button, Text, Loading, etc.) built with Tailwind and CVA for design consistency.
+- **`components/features/`**: Domain-specific components (JobGrid, ProfileSection) that encapsulate business logic.
+- **`components/sections/`**: Large page-level sections (Hero, LatestJobs) often rendered as Server Components for performance.
+- **`components/layout/`**: Global layout components like Navbar, Footer, and MobileMenu.
+
+### **2. API Calling & Handling**
+
+- **Axios Client**: Centralized `apiClient` in `lib/axios.ts` handles base URL, timeouts, and headers.
+- **Public Client**: A separate `publicApiClient` handles unauthenticated requests (like Login/Register) to avoid interceptor side effects.
+- **Services Layer**: API interactions are abstracted into the `services/` directory, providing a clean interface for data fetching.
+- **React Query**: Frontend state, caching, and background synchronization are managed using `@tanstack/react-query` through custom hooks in `hooks/`.
+
+### **3. Authentication & Session Management**
+
+- **NextAuth.js**: Implements the `Credentials` provider for flexible authentication.
+- **JWT Strategy**: Secure session storage using encrypted JSON Web Tokens on the client.
+- **Extended Types**: Custom type definitions in `next-auth.d.ts` extend the base Session and User objects to store additional metadata (role, tokens, etc.).
+
+### **4. Robust Refresh Token Mechanism**
+
+- **Proactive Refresh**: The NextAuth `jwt` callback checks token expiration and automatically rotates tokens in the background before they expire.
+- **Reactive Interceptor**: An Axios response interceptor catches 401 errors from concurrent requests.
+- **Locking & Queueing**: A robust locking mechanism prevents multiple simultaneous refresh calls. While one request refreshes the token, others are queued and automatically retried once the new token is available.
+- **Automatic Logout**: If a background refresh fails (e.g., the refresh token itself expired), the `AuthRefreshHandler` in `providers.tsx` detects the error and signs the user out safely to the login page.
 
 ---
 

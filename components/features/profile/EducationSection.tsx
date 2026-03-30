@@ -8,7 +8,10 @@ interface EducationSectionProps {
   setProfile: (p: Profile) => void;
 }
 
-export function EducationSection({ profile, setProfile }: EducationSectionProps) {
+export function EducationSection({
+  profile,
+  setProfile,
+}: EducationSectionProps) {
   const addEducation = () => {
     const e: Education = {
       institution: "",
@@ -45,7 +48,7 @@ export function EducationSection({ profile, setProfile }: EducationSectionProps)
     >
       {profile.education.length === 0 ? (
         <div className="text-center py-10 border-2 border-dashed border-neutral-20">
-          <Text variant="body_md" className="text-neutral-60 mb-3">
+          <Text variant="body_md" className="text-neutral-60 text-encter mb-3">
             No education records added yet.
           </Text>
           <Button onClick={addEducation} type="button">
@@ -55,10 +58,7 @@ export function EducationSection({ profile, setProfile }: EducationSectionProps)
       ) : (
         <div className="flex flex-col gap-6">
           {profile.education.map((ed, i) => (
-            <div
-              key={i}
-              className="border border-border p-6 relative"
-            >
+            <div key={i} className="border border-border p-6 relative">
               <button
                 onClick={() => removeEducation(i)}
                 className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-neutral-60 hover:text-accent-red transition-colors border border-border hover:border-accent-red"

@@ -8,7 +8,6 @@ import { JobFilters } from "@/components/features/jobs/JobFilters";
 import { JobGrid } from "@/components/features/jobs/JobGrid";
 import { JobPagination } from "@/components/features/jobs/JobPagination";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { serverFetch } from "@/lib/api/serverFetch";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import { Category, ExperienceLevel, JobType } from "@/services/types";
 import Loading from "@/components/ui/Loading";

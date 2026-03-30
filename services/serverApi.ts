@@ -107,17 +107,3 @@ export async function getJobs({
   }
 }
 
-export async function getJobDetails({ slug }: { slug: string }): Promise<Job> {
-  try {
-    // For job details, we might want to use the apiClient if it needs auth,
-    // but here it seems to be public details.
-    const res = await fetchWithTimeout(`${url}/api/v1/jobs/${slug}`);
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-    const body: { success: true; data: Job } = await res.json();
-    return body.data;
-  } catch (error) {
-    console.error("[API Error] getJobDetails:", error);
-    return {} as Job;
-  }
-}
-

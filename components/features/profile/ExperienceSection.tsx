@@ -8,7 +8,10 @@ interface ExperienceSectionProps {
   setProfile: (p: Profile) => void;
 }
 
-export function ExperienceSection({ profile, setProfile }: ExperienceSectionProps) {
+export function ExperienceSection({
+  profile,
+  setProfile,
+}: ExperienceSectionProps) {
   const addExperience = () => {
     const e: Experience = {
       company: "",
@@ -46,7 +49,7 @@ export function ExperienceSection({ profile, setProfile }: ExperienceSectionProp
     >
       {profile.experiences.length === 0 ? (
         <div className="text-center py-10 border-2 border-dashed border-neutral-20">
-          <Text variant="body_md" className="text-neutral-60 mb-3">
+          <Text variant="body_md" className="text-neutral-60 text-center mb-3">
             No work experience added yet.
           </Text>
           <Button onClick={addExperience} type="button">
@@ -56,10 +59,7 @@ export function ExperienceSection({ profile, setProfile }: ExperienceSectionProp
       ) : (
         <div className="flex flex-col gap-8">
           {profile.experiences.map((exp, i) => (
-            <div
-              key={i}
-              className="border border-border p-6 relative"
-            >
+            <div key={i} className="border border-border p-6 relative">
               <button
                 onClick={() => removeExperience(i)}
                 className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-neutral-60 hover:text-accent-red transition-colors border border-border hover:border-accent-red"
@@ -139,9 +139,7 @@ export function ExperienceSection({ profile, setProfile }: ExperienceSectionProp
                       <button
                         onClick={() =>
                           updateExperience(i, {
-                            bullets: exp.bullets.filter(
-                              (_, idx) => idx !== bi
-                            ),
+                            bullets: exp.bullets.filter((_, idx) => idx !== bi),
                           })
                         }
                         type="button"

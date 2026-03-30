@@ -232,12 +232,18 @@ export default function ApplicationsPage() {
         {filtered.length === 0 ? (
           <div className="bg-white border border-border p-20 text-center">
             <div className="text-6xl mb-4">📋</div>
-            <Text variant="title_lg" className="text-neutral-100 mb-2">
+            <Text
+              variant="title_lg"
+              className="text-neutral-100 text-center mb-2"
+            >
               {filter === "all"
                 ? "No applications yet"
                 : `No ${FILTERS.find((f) => f.key === filter)?.label.toLowerCase()} applications`}
             </Text>
-            <Text variant="body_md" className="text-neutral-60 mb-6">
+            <Text
+              variant="body_md"
+              className="text-neutral-60 text-center mb-6"
+            >
               Start by browsing available jobs and applying to positions that
               interest you.
             </Text>
