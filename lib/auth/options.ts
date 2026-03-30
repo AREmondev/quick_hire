@@ -1,7 +1,12 @@
 import Credentials from "next-auth/providers/credentials";
-import { login } from "@/lib/api/auth";
+import { login, refreshTokens } from "@/lib/api/auth";
 import type { AuthUser } from "@/services/types";
 import type { AuthOptions, SessionStrategy } from "next-auth";
+
+const ACCESS_TOKEN_EXPIRES_MINUTES = parseInt(
+  process.env.NEXT_PUBLIC_ACCESS_TOKEN_EXPIRES_MINUTES || "1440",
+);
+const ACCESS_TOKEN_EXPIRES_MS = ACCESS_TOKEN_EXPIRES_MINUTES * 60 * 1000;
 
 export const authConfig: AuthOptions = {
   session: { strategy: "jwt" as SessionStrategy },
@@ -25,17 +30,29 @@ export const authConfig: AuthOptions = {
           companyId: user.companyId,
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
-        };
+        } as any;
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        token.user = user;
-        token.accessToken = user.accessToken;
-        token.refreshToken = user.refreshToken;
+        // Cast user to our extended User type
+        const u = user as any;
+        token.user = {
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role,
+          companyId: u.companyId,
+        };
+        token.accessToken = u.accessToken;
+        token.refreshToken = u.refreshToken;
+        // Set expiry based on configuration
+        token.accessTokenExpires = Date.now() + ACCESS_TOKEN_EXPIRES_MS;
       }
+
+      // Handle manual session updates
       if (trigger === "update" && session?.user) {
         token.user = { ...token.user, ...session.user };
         if (session.user.accessToken)
@@ -43,13 +60,46 @@ export const authConfig: AuthOptions = {
         if (session.user.refreshToken)
           token.refreshToken = session.user.refreshToken;
       }
-      return token;
+
+      // If the access token has not expired yet, just return the token
+      if (Date.now() < (token.accessTokenExpires as number)) {
+        return token;
+      }
+
+      // If the access token has expired, try to refresh it
+      // But only if we haven't already failed
+      if (token.error === "RefreshAccessTokenError") {
+        return token;
+      }
+
+      try {
+        if (!token.refreshToken) {
+          throw new Error("No refresh token available");
+        }
+        const newTokens = await refreshTokens(token.refreshToken as string);
+        if (newTokens?.accessToken) {
+          return {
+            ...token,
+            accessToken: newTokens.accessToken,
+            refreshToken: newTokens.refreshToken ?? token.refreshToken,
+            accessTokenExpires: Date.now() + ACCESS_TOKEN_EXPIRES_MS,
+            error: undefined, // Clear any previous error
+          };
+        }
+        throw new Error("Failed to refresh tokens");
+      } catch (error) {
+        console.error("Error refreshing access token", error);
+        return {
+          ...token,
+          error: "RefreshAccessTokenError" as const,
+        };
+      }
     },
     async session({ session, token }) {
-      // console.log("Session", session, token);
       session.user = token.user;
       session.accessToken = token.accessToken;
       session.refreshToken = token.refreshToken;
+      session.error = token.error;
       return session;
     },
   },

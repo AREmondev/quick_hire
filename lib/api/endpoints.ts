@@ -2,6 +2,8 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: "/api/v1/auth/login",
     REGISTER: "/api/v1/auth/register",
+    REFRESH_TOKENS: "/api/v1/auth/refresh",
+    LOGOUT: "/api/v1/auth/logout",
   },
   JOBS: {
     PUBLIC_LIST: "/api/v1/jobs",

@@ -1,8 +1,12 @@
 import axios from "axios";
 import { getSession, signOut } from "next-auth/react";
+import { API_ENDPOINTS } from "./api/endpoints";
 
-const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000",
+const baseURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+
+// Public instance for requests that don't need auth or handle it differently
+export const publicApiClient = axios.create({
+  baseURL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -10,12 +14,33 @@ const apiClient = axios.create({
   },
 });
 
+const apiClient = axios.create({
+  baseURL,
+  timeout: 10000,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+});
+
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 apiClient.interceptors.request.use(
   async (config) => {
-    // console.log("config", config);
     const session = await getSession();
-    const accessToken = (session as unknown as { accessToken?: string } | null)
-      ?.accessToken;
+    const accessToken = session?.accessToken;
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -27,11 +52,58 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const status = error?.response?.status;
-    if (status === 401) {
-      await signOut({ redirect: false });
-      if (typeof window !== "undefined") window.location.href = "/auth/login";
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return apiClient(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      isRefreshing = true;
+
+      try {
+        const session = await getSession();
+        if (!session?.refreshToken) {
+          throw new Error("No refresh token");
+        }
+
+        // Use publicApiClient to avoid interceptors
+        const res = await publicApiClient.post(
+          API_ENDPOINTS.AUTH.REFRESH_TOKENS,
+          {
+            refreshToken: session.refreshToken,
+          },
+        );
+
+        const newTokens = res.data.data;
+        if (newTokens?.tokens?.accessToken) {
+          const newToken = newTokens.tokens.accessToken;
+          processQueue(null, newToken);
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return apiClient(originalRequest);
+        }
+        throw new Error("No access token returned");
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        await signOut({ redirect: false });
+        if (typeof window !== "undefined") {
+          window.location.href = "/auth/login";
+        }
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
+
     return Promise.reject(error);
   },
 );
