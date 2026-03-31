@@ -1,6 +1,8 @@
-import { Button } from "@/components/ui/Button";
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Text";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 const BillBord = () => {
@@ -15,9 +17,15 @@ const BillBord = () => {
             <Text variant={"body_md"} className="text-white">
               Start posting jobs for only $10.
             </Text>
-            <Button className="w-fit" variant={"white"}>
+            {/* <Button onClick={} className="w-fit" variant={"white"}>
               Sign Up For Free
-            </Button>
+            </Button> */}
+            <Link
+              href="/auth/register"
+              className={cn(buttonVariants({ variant: "white" }))}
+            >
+              Sign Up For Free
+            </Link>
           </div>
         </div>
         <div className="absolute hidden lg:block right-[70px] bottom-0">

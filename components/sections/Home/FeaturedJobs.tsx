@@ -15,7 +15,7 @@ const FeaturedJobs = async () => {
     <section className="w-full overflow-hidden py-18">
       <div className="container">
         <div className="flex flex-col gap-12">
-          <div className="flex items-end gap-10 justify-between">
+          <div className="flex flex-wrap items-end gap-10 justify-between">
             <Text variant={"h2"} fontFamily={"clash"}>
               Featured <span className="text-accent-blue">jobs</span>
             </Text>

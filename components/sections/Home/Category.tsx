@@ -39,7 +39,7 @@ const Category = async () => {
     <section className="w-full overflow-hidden pt-18">
       <div className="container">
         <div className=" flex flex-col gap-12">
-          <div className="flex items-end gap-10 justify-between">
+          <div className="flex flex-wrap items-end gap-10 justify-between">
             <Text variant={"h2"} fontFamily={"clash"}>
               Explore by <span className="text-accent-blue">category</span>
             </Text>

@@ -15,7 +15,7 @@ const LatestJobs = async () => {
     <section className="w-full overflow-hidden pt-18 pb-20 bg-light-gray">
       <div className="container">
         <div className="flex flex-col gap-12">
-          <div className="flex items-end gap-10 justify-between">
+          <div className="flex flex-wrap items-end gap-10 justify-between">
             <Text variant={"h2"} fontFamily={"clash"}>
               Latest <span className="text-accent-blue">jobs</span>
             </Text>
