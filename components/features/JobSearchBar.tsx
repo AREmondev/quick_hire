@@ -136,7 +136,7 @@ export default function JobSearchBar() {
     <div className="flex flex-col gap-4 z-[100]">
       <div className="flex flex-col md:flex-row items-center p-2 md:p-4 bg-white max-w-[857px] shadow-sm">
         {/* Job title */}
-        <div className="flex items-center flex-1 gap-4 px-4 h-[57px] w-full border-b md:border-b-0 md:border-r border-border">
+        <div className="flex  md:h-auto items-center flex-1 gap-4 px-4 min-h-[57px] w-full border-b md:border-b-0 md:border-r border-border">
           <span className="shrink-0">
             <SearchIcon />
           </span>
@@ -158,7 +158,7 @@ export default function JobSearchBar() {
         {/* Location - Searchable Select */}
         <div
           ref={dropdownRef}
-          className="flex items-center flex-1 gap-4 px-4 h-[57px] w-full relative"
+          className="flex items-center flex-1 gap-4 px-4 min-h-[57px] w-full relative"
         >
           <span className="shrink-0">
             <LocationIcon />
