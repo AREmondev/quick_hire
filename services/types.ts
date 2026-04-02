@@ -157,6 +157,7 @@ export interface ExperienceBullet {
 }
 
 export interface Experience {
+  _id?: string;
   id?: string;
   company: string;
   role: string;
@@ -167,6 +168,7 @@ export interface Experience {
 }
 
 export interface Education {
+  _id?: string;
   id?: string;
   institution: string;
   degree?: string;
@@ -176,6 +178,7 @@ export interface Education {
 }
 
 export interface Project {
+  _id?: string;
   id?: string;
   name: string;
   link?: string;

@@ -2,6 +2,8 @@ import { useFormContext } from "react-hook-form";
 import { ProfileInput } from "@/lib/validations";
 import { FormInput, SectionCardWithFooter } from "./FormComponents";
 import { Button } from "@/components/ui/Button";
+import { useUpdateBasicInfoMutation } from "@/hooks/profile";
+import { useToast } from "@/hooks/useToast";
 
 export function BasicInfoSection() {
   const {
@@ -10,22 +12,44 @@ export function BasicInfoSection() {
     handleSubmit,
   } = useFormContext<ProfileInput>();
 
+  const updateBasicInfoMutation = useUpdateBasicInfoMutation();
+  const { show } = useToast();
+
   const isDirty = !!Object.keys(dirtyFields).length;
 
-  const onSave = (data: ProfileInput) => {
-    // Here you would trigger an API call to save the basic info
-    console.log("Saving basic info:", data);
+  const onSave = async (data: ProfileInput) => {
+    try {
+      // Only send basic info fields
+      const basicInfo = {
+        name: data.name,
+        title: data.title,
+        email: data.email,
+        phone: data.phone,
+        location: data.location,
+        website: data.website,
+        github: data.github,
+        linkedin: data.linkedin,
+        portfolio: data.portfolio,
+      };
+
+      await updateBasicInfoMutation.mutateAsync(basicInfo);
+      show("Your basic information has been saved successfully.", "success");
+    } catch (error: any) {
+      show(error.message || "Failed to update basic information.", "error");
+    }
   };
 
   return (
     <SectionCardWithFooter
       title="Basic Information"
       footer={
-        isDirty && (
-          <Button onClick={handleSubmit(onSave)} isLoading={false}>
-            Save Changes
-          </Button>
-        )
+        <Button
+          onClick={handleSubmit(onSave)}
+          isLoading={updateBasicInfoMutation.isPending}
+          disabled={!isDirty}
+        >
+          Save Changes
+        </Button>
       }
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

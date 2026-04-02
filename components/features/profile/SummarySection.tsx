@@ -3,6 +3,8 @@ import { ProfileInput } from "@/lib/validations";
 import { Text } from "@/components/ui/Text";
 import { FormTextArea, SectionCardWithFooter } from "./FormComponents";
 import { Button } from "@/components/ui/Button";
+import { useUpdateSummaryMutation } from "@/hooks/profile";
+import { useToast } from "@/hooks/useToast";
 
 export function SummarySection() {
   const {
@@ -11,10 +13,18 @@ export function SummarySection() {
     handleSubmit,
   } = useFormContext<ProfileInput>();
 
+  const updateSummaryMutation = useUpdateSummaryMutation();
+  const { show } = useToast();
+
   const isDirty = !!dirtyFields.summary;
 
-  const onSave = (data: ProfileInput) => {
-    console.log("Saving summary:", data.summary);
+  const onSave = async (data: ProfileInput) => {
+    try {
+      await updateSummaryMutation.mutateAsync(data.summary || "");
+      show("Professional summary updated successfully.", "success");
+    } catch (error: any) {
+      show(error.message || "Failed to update summary.", "error");
+    }
   };
 
   return (
@@ -22,7 +32,10 @@ export function SummarySection() {
       title="Professional Summary"
       footer={
         isDirty && (
-          <Button onClick={handleSubmit(onSave)} isLoading={false}>
+          <Button
+            onClick={handleSubmit(onSave)}
+            isLoading={updateSummaryMutation.isPending}
+          >
             Save Summary
           </Button>
         )

@@ -75,7 +75,7 @@ export function ExperienceForm({
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className=" flex flex-col gap-3 ">
         <label className="text-[13px] font-semibold text-neutral-80 uppercase tracking-wide">
           Key Achievements / Bullets
         </label>
@@ -86,21 +86,35 @@ export function ExperienceForm({
               placeholder={`Achievement #${index + 1}`}
               {...register(`bullets.${index}.description`)}
               error={errors.bullets?.[index]?.description?.message}
-              className="flex-1"
+              className="flex-1 min-h-11!"
             />
-            <Button
-              type="button"
+
+            <button
               onClick={() => remove(index)}
-              className="h-11 w-11 shrink-0 bg-red-500 text-white hover:bg-red-600 transition-colors"
+              // disabled={deleteMutation.isPending}
+              className="p-2 rounded-md text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+              aria-label="Delete experience"
             >
-              ×
-            </Button>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </button>
           </div>
         ))}
         <Button
           type="button"
           onClick={() => append({ description: "" })}
-          className="text-sm border border-border hover:bg-light-gray transition-colors"
+          className="text-sm border max-w-fit border-border transition-colors"
         >
           + Add Bullet
         </Button>

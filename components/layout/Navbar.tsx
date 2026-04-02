@@ -26,7 +26,8 @@ const Navbar = () => {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement>(null);
+  const profileRefDesktop = useRef<HTMLDivElement>(null);
+  const profileRefMobile = useRef<HTMLDivElement>(null);
   const { data: session } = useSession();
   const user = session?.user as User | undefined;
 
@@ -43,13 +44,23 @@ const Navbar = () => {
   const closeProfile = useCallback(() => setProfileOpen(false), []);
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
+  // Close dropdowns on navigation
+  useEffect(() => {
+    setProfileOpen(false);
+    setMobileOpen(false);
+  }, [pathname]);
+
   // Handle click outside to close profile dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        profileRef.current &&
-        !profileRef.current.contains(event.target as Node)
-      ) {
+      const isOutsideDesktop =
+        !profileRefDesktop.current ||
+        !profileRefDesktop.current.contains(event.target as Node);
+      const isOutsideMobile =
+        !profileRefMobile.current ||
+        !profileRefMobile.current.contains(event.target as Node);
+
+      if (isOutsideDesktop && isOutsideMobile) {
         setProfileOpen(false);
       }
     };
@@ -111,7 +122,7 @@ const Navbar = () => {
               </Link>
             </>
           ) : (
-            <div className="relative" ref={profileRef}>
+            <div className="relative" ref={profileRefDesktop}>
               <button
                 onClick={toggleProfile}
                 className="flex items-center gap-3 group focus:outline-none"
@@ -155,7 +166,7 @@ const Navbar = () => {
               <Button className="h-9 px-4 text-[13px]">Login</Button>
             </Link>
           ) : (
-            <div className="relative" ref={profileRef}>
+            <div className="relative" ref={profileRefMobile}>
               <button
                 onClick={toggleProfile}
                 className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-semibold shadow-sm text-xs"

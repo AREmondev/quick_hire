@@ -18,6 +18,17 @@ export const API_ENDPOINTS = {
   },
   PROFILES: {
     ME: "/api/v1/profiles/me",
+    BASIC_INFO: "/api/v1/profiles/me/basic-info",
+    SUMMARY: "/api/v1/profiles/me/summary",
+    SKILLS: "/api/v1/profiles/me/skills",
+    REMOVE_SKILL: (type: string, skill: string) =>
+      `/api/v1/profiles/me/skills/${type}/${skill}`,
+    EXPERIENCES: "/api/v1/profiles/me/experiences",
+    EXPERIENCE_DETAIL: (id: string) => `/api/v1/profiles/me/experiences/${id}`,
+    EDUCATION: "/api/v1/profiles/me/education",
+    EDUCATION_DETAIL: (id: string) => `/api/v1/profiles/me/education/${id}`,
+    PROJECTS: "/api/v1/profiles/me/projects",
+    PROJECT_DETAIL: (id: string) => `/api/v1/profiles/me/projects/${id}`,
     RESUME: "/api/v1/profiles/me/resume",
   },
   APPLICATIONS: {
