@@ -1,7 +1,7 @@
 import { Profile } from "@/services/types";
 import { Text } from "@/components/ui/Text";
-import { SectionCard } from "./FormComponents";
 import { useRef } from "react";
+import { SectionCardWithFooter } from "./FormComponents";
 
 interface ResumeSectionProps {
   profile: Profile;
@@ -24,7 +24,7 @@ export function ResumeSection({
   };
 
   return (
-    <SectionCard title="Upload PDF Resume">
+    <SectionCardWithFooter title="Upload PDF Resume">
       <div className="flex flex-col gap-5">
         {profile.resume ? (
           <div className="flex items-center gap-4 p-5 border border-accent-green/30 bg-accent-green/5">
@@ -85,6 +85,6 @@ export function ResumeSection({
           onChange={handleFileChange}
         />
       </div>
-    </SectionCard>
+    </SectionCardWithFooter>
   );
 }

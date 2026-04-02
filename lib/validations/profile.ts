@@ -5,6 +5,8 @@ export const experienceBulletSchema = z.object({
 });
 
 export const experienceSchema = z.object({
+  _id: z.string().optional(),
+  id: z.string().optional(),
   company: z.string().trim().min(1, "Company is required"),
   role: z.string().trim().min(1, "Role is required"),
   location: z.string().trim().optional().or(z.literal("")),
@@ -14,6 +16,8 @@ export const experienceSchema = z.object({
 });
 
 export const educationSchema = z.object({
+  _id: z.string().optional(),
+  id: z.string().optional(),
   institution: z.string().trim().min(1, "Institution is required"),
   degree: z.string().trim().optional().or(z.literal("")),
   startDate: z.string().optional().or(z.literal("")),
@@ -22,8 +26,10 @@ export const educationSchema = z.object({
 });
 
 export const projectSchema = z.object({
+  _id: z.string().optional(),
+  id: z.string().optional(),
   name: z.string().trim().min(1, "Project name is required"),
-  link: z.string().trim().url("Invalid URL").optional().or(z.literal("")),
+  link: z.string().trim().optional().or(z.literal("")),
   description: z.string().optional().or(z.literal("")),
   tech: z.array(z.string()).optional(),
 });
@@ -35,10 +41,10 @@ export const profileSchema = z.object({
   phone: z.string().trim().optional().or(z.literal("")),
   location: z.string().trim().optional().or(z.literal("")),
   summary: z.string().trim().optional().or(z.literal("")),
-  website: z.string().trim().url("Invalid URL").optional().or(z.literal("")),
-  github: z.string().trim().url("Invalid URL").optional().or(z.literal("")),
-  linkedin: z.string().trim().url("Invalid URL").optional().or(z.literal("")),
-  portfolio: z.string().trim().url("Invalid URL").optional().or(z.literal("")),
+  website: z.string().trim().optional().or(z.literal("")),
+  github: z.string().trim().optional().or(z.literal("")),
+  linkedin: z.string().trim().optional().or(z.literal("")),
+  portfolio: z.string().trim().optional().or(z.literal("")),
   skills: z.array(z.string()).optional(),
   technicalSkills: z.array(z.string()).optional(),
   tools: z.array(z.string()).optional(),

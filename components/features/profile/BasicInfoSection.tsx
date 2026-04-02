@@ -1,15 +1,57 @@
-import { UseFormRegister, FieldErrors } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { ProfileInput } from "@/lib/validations";
-import { FormInput, SectionCard } from "./FormComponents";
+import { FormInput, SectionCardWithFooter } from "./FormComponents";
+import { Button } from "@/components/ui/Button";
+import { useUpdateBasicInfoMutation } from "@/hooks/profile";
+import { useToast } from "@/hooks/useToast";
 
-interface BasicInfoSectionProps {
-  register: UseFormRegister<ProfileInput>;
-  errors: FieldErrors<ProfileInput>;
-}
+export function BasicInfoSection() {
+  const {
+    register,
+    formState: { errors, dirtyFields },
+    handleSubmit,
+  } = useFormContext<ProfileInput>();
 
-export function BasicInfoSection({ register, errors }: BasicInfoSectionProps) {
+  const updateBasicInfoMutation = useUpdateBasicInfoMutation();
+  const { show } = useToast();
+
+  const isDirty = !!Object.keys(dirtyFields).length;
+
+  const onSave = async (data: ProfileInput) => {
+    try {
+      // Only send basic info fields
+      const basicInfo = {
+        name: data.name,
+        title: data.title,
+        email: data.email,
+        phone: data.phone,
+        location: data.location,
+        website: data.website,
+        github: data.github,
+        linkedin: data.linkedin,
+        portfolio: data.portfolio,
+      };
+
+      await updateBasicInfoMutation.mutateAsync(basicInfo);
+      show("Your basic information has been saved successfully.", "success");
+    } catch (error: any) {
+      show(error.message || "Failed to update basic information.", "error");
+    }
+  };
+
   return (
-    <SectionCard title="Basic Information">
+    <SectionCardWithFooter
+      title="Basic Information"
+      footer={
+        <Button
+          onClick={handleSubmit(onSave)}
+          isLoading={updateBasicInfoMutation.isPending}
+          disabled={!isDirty}
+        >
+          Save Changes
+        </Button>
+      }
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <FormInput
           label="Full Name *"
@@ -67,6 +109,6 @@ export function BasicInfoSection({ register, errors }: BasicInfoSectionProps) {
           error={errors.portfolio?.message}
         />
       </div>
-    </SectionCard>
+    </SectionCardWithFooter>
   );
 }

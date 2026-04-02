@@ -1,16 +1,46 @@
-import { UseFormRegister, FieldErrors } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { ProfileInput } from "@/lib/validations";
 import { Text } from "@/components/ui/Text";
-import { FormTextArea, SectionCard } from "./FormComponents";
+import { FormTextArea, SectionCardWithFooter } from "./FormComponents";
+import { Button } from "@/components/ui/Button";
+import { useUpdateSummaryMutation } from "@/hooks/profile";
+import { useToast } from "@/hooks/useToast";
 
-interface SummarySectionProps {
-  register: UseFormRegister<ProfileInput>;
-  errors: FieldErrors<ProfileInput>;
-}
+export function SummarySection() {
+  const {
+    register,
+    formState: { errors, dirtyFields },
+    handleSubmit,
+  } = useFormContext<ProfileInput>();
 
-export function SummarySection({ register, errors }: SummarySectionProps) {
+  const updateSummaryMutation = useUpdateSummaryMutation();
+  const { show } = useToast();
+
+  const isDirty = !!dirtyFields.summary;
+
+  const onSave = async (data: ProfileInput) => {
+    try {
+      await updateSummaryMutation.mutateAsync(data.summary || "");
+      show("Professional summary updated successfully.", "success");
+    } catch (error: any) {
+      show(error.message || "Failed to update summary.", "error");
+    }
+  };
+
   return (
-    <SectionCard title="Professional Summary">
+    <SectionCardWithFooter
+      title="Professional Summary"
+      footer={
+        isDirty && (
+          <Button
+            onClick={handleSubmit(onSave)}
+            isLoading={updateSummaryMutation.isPending}
+          >
+            Save Summary
+          </Button>
+        )
+      }
+    >
       <FormTextArea
         label="Summary"
         placeholder="Write a compelling 2-4 sentence summary highlighting your experience, key skills, and career goals..."
@@ -27,6 +57,6 @@ export function SummarySection({ register, errors }: SummarySectionProps) {
           expertise, and end with what you&apos;re looking for next.
         </Text>
       </div>
-    </SectionCard>
+    </SectionCardWithFooter>
   );
 }

@@ -1,15 +1,11 @@
 import Link from "next/link";
 import { Text } from "@/components/ui/Text";
-import { Button } from "@/components/ui/Button";
 
 interface ProfileHeaderProps {
   completeness: number;
-  onSave: () => void;
-  canSave: boolean;
-  saved: boolean;
 }
 
-export function ProfileHeader({ completeness, onSave, canSave, saved }: ProfileHeaderProps) {
+export function ProfileHeader({ completeness }: ProfileHeaderProps) {
   return (
     <div className="bg-white border-b border-border">
       <div className="container py-8">
@@ -32,15 +28,6 @@ export function ProfileHeader({ completeness, onSave, canSave, saved }: ProfileH
                 Preview Resume
               </button>
             </Link>
-            <Button
-              onClick={onSave}
-              disabled={!canSave}
-              className={`h-[50px] px-8 disabled:opacity-60 transition-all ${
-                saved ? "bg-accent-green" : ""
-              }`}
-            >
-              {saved ? "Saved! ✓" : "Save Profile"}
-            </Button>
           </div>
         </div>
 

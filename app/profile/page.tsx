@@ -1,9 +1,10 @@
 "use client";
 import { useMemo, useState, useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema, type ProfileInput } from "@/lib/validations";
 import { getErrorMessage } from "@/lib/utils";
+import { useDebounce } from "@/hooks/useDebounce";
 import { Text } from "@/components/ui/Text";
 import {
   useMyProfileQuery,
@@ -34,6 +35,10 @@ export default function ProfilePage() {
   const [error, setError] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
 
+  const methods = useForm<ProfileInput>({
+    resolver: zodResolver(profileSchema),
+  });
+
   const {
     register,
     handleSubmit,
@@ -42,9 +47,7 @@ export default function ProfilePage() {
     control,
     setValue,
     formState: { errors, isDirty },
-  } = useForm<ProfileInput>({
-    resolver: zodResolver(profileSchema),
-  });
+  } = methods;
 
   const {
     fields: experienceFields,
@@ -99,6 +102,7 @@ export default function ProfilePage() {
   }, [serverProfile, reset]);
 
   const profileData = watch();
+
 
   const canSave = useMemo(
     () =>
@@ -162,12 +166,7 @@ export default function ProfilePage() {
 
   return (
     <main className="min-h-screen bg-light-gray pt-[78px]">
-      <ProfileHeader
-        completeness={completeness}
-        onSave={handleSubmit(onSubmit)}
-        canSave={canSave}
-        saved={saved}
-      />
+      <ProfileHeader completeness={completeness} />
 
       <div className="container py-10">
         {error ? (
@@ -179,47 +178,14 @@ export default function ProfilePage() {
           <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
           <div className="flex-1 flex flex-col gap-6">
-            {activeTab === "basic" && (
-              <BasicInfoSection register={register} errors={errors} />
-            )}
-            {activeTab === "summary" && (
-              <SummarySection register={register} errors={errors} />
-            )}
-            {activeTab === "skills" && (
-              <SkillsSection
-                setValue={setValue}
-                skills={profileData.skills || []}
-                technicalSkills={profileData.technicalSkills || []}
-                tools={profileData.tools || []}
-              />
-            )}
-            {activeTab === "experience" && (
-              <ExperienceSection
-                register={register}
-                errors={errors}
-                fields={experienceFields}
-                append={appendExperience}
-                remove={removeExperience}
-              />
-            )}
-            {activeTab === "education" && (
-              <EducationSection
-                register={register}
-                errors={errors}
-                fields={educationFields}
-                append={appendEducation}
-                remove={removeEducation}
-              />
-            )}
-            {activeTab === "projects" && (
-              <ProjectSection
-                register={register}
-                errors={errors}
-                fields={projectFields}
-                append={appendProject}
-                remove={removeProject}
-              />
-            )}
+            <FormProvider {...methods}>
+              {activeTab === "basic" && <BasicInfoSection />}
+              {activeTab === "summary" && <SummarySection />}
+              {activeTab === "skills" && <SkillsSection />}
+              {activeTab === "experience" && <ExperienceSection />}
+              {activeTab === "education" && <EducationSection />}
+              {activeTab === "projects" && <ProjectSection />}
+            </FormProvider>
             {activeTab === "resume" && (
               <ResumeSection
                 profile={profile}

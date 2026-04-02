@@ -29,7 +29,6 @@ const MobileMenu = ({
             <Link
               key={link.href}
               href={link.href}
-              onClick={onClose}
               className={cn(
                 "px-4 py-3 font-medium text-[15px] transition-colors",
                 isActive ? "text-primary bg-primary/5" : "text-neutral-60",
