@@ -1,28 +1,32 @@
-import { Profile, Project } from "@/services/types";
+import { UseFormRegister, FieldErrors, FieldArrayWithId } from "react-hook-form";
+import { ProfileInput } from "@/lib/validations";
 import { Text } from "@/components/ui/Text";
 import { Button } from "@/components/ui/Button";
-import { FormInput, FormTextArea, SectionCard } from "./FormComponents";
+import { FormInput, SectionCard } from "./FormComponents";
 
 interface ProjectSectionProps {
-  profile: Profile;
-  setProfile: (p: Profile) => void;
+  register: UseFormRegister<ProfileInput>;
+  errors: FieldErrors<ProfileInput>;
+  fields: FieldArrayWithId<ProfileInput, "projects">[];
+  append: (value: any) => void;
+  remove: (index: number) => void;
 }
 
-export function ProjectSection({ profile, setProfile }: ProjectSectionProps) {
+export function ProjectSection({
+  register,
+  errors,
+  fields,
+  append,
+  remove,
+}: ProjectSectionProps) {
   const addProject = () => {
-    const p: Project = { name: "", link: "", description: "", tech: [] };
-    setProfile({ ...profile, projects: [...profile.projects, p] });
-  };
-  const updateProject = (i: number, patch: Partial<Project>) => {
-    const arr = [...profile.projects];
-    arr[i] = { ...arr[i], ...patch };
-    setProfile({ ...profile, projects: arr });
-  };
-  const removeProject = (i: number) =>
-    setProfile({
-      ...profile,
-      projects: profile.projects.filter((_, idx) => idx !== i),
+    append({
+      name: "",
+      description: "",
+      link: "",
+      tech: [],
     });
+  };
 
   return (
     <SectionCard
@@ -37,7 +41,7 @@ export function ProjectSection({ profile, setProfile }: ProjectSectionProps) {
         </Button>
       }
     >
-      {profile.projects.length === 0 ? (
+      {fields.length === 0 ? (
         <div className="text-center py-10 border-2 border-dashed border-neutral-20">
           <Text variant="body_md" className="text-neutral-60 text-center mb-3">
             No projects added yet.
@@ -47,39 +51,43 @@ export function ProjectSection({ profile, setProfile }: ProjectSectionProps) {
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col gap-6">
-          {profile.projects.map((pr, i) => (
-            <div key={i} className="border border-border p-6 relative">
+        <div className="flex flex-col gap-8">
+          {fields.map((field, i) => (
+            <div key={field.id} className="border border-border p-6 relative">
               <button
-                onClick={() => removeProject(i)}
+                onClick={() => remove(i)}
                 className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-neutral-60 hover:text-accent-red transition-colors border border-border hover:border-accent-red"
                 type="button"
               >
                 ×
               </button>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Text
+                variant="body_sm"
+                className="text-primary font-bold uppercase tracking-wide mb-4"
+              >
+                Project {i + 1}
+              </Text>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <FormInput
                   label="Project Name"
                   placeholder="e.g. E-commerce Platform"
-                  value={pr.name}
-                  onChange={(e) => updateProject(i, { name: e.target.value })}
+                  {...register(`projects.${i}.name`)}
+                  error={errors.projects?.[i]?.name?.message}
                 />
                 <FormInput
-                  label="Live Link / Repo URL"
+                  label="Link"
                   placeholder="https://github.com/..."
-                  value={pr.link || ""}
-                  onChange={(e) => updateProject(i, { link: e.target.value })}
-                />
-                <FormTextArea
-                  label="Description"
-                  placeholder="What does it do? What problem does it solve?"
-                  value={pr.description}
-                  onChange={(e) =>
-                    updateProject(i, { description: e.target.value })
-                  }
-                  className="md:col-span-2"
+                  {...register(`projects.${i}.link`)}
+                  error={errors.projects?.[i]?.link?.message}
                 />
               </div>
+              <FormInput
+                label="Description"
+                placeholder="Briefly describe what you built..."
+                {...register(`projects.${i}.description`)}
+                error={errors.projects?.[i]?.description?.message}
+              />
+              {/* Tech stack could be handled similarly to skills if needed */}
             </div>
           ))}
         </div>

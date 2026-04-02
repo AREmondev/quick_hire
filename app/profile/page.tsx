@@ -1,5 +1,9 @@
 "use client";
 import { useMemo, useState, useEffect } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { profileSchema, type ProfileInput } from "@/lib/validations";
+import { getErrorMessage } from "@/lib/utils";
 import { Text } from "@/components/ui/Text";
 import {
   useMyProfileQuery,
@@ -25,46 +29,114 @@ export default function ProfilePage() {
   const uploadResumeMutation = useUploadResumeMutation();
   const deleteResumeMutation = useDeleteResumeMutation();
 
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [activeTab, setActiveTab] = useState("basic");
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+  const [profile, setProfile] = useState<Profile | null>(null);
 
-  // Sync server profile to local state for editing
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    control,
+    setValue,
+    formState: { errors, isDirty },
+  } = useForm<ProfileInput>({
+    resolver: zodResolver(profileSchema),
+  });
+
+  const {
+    fields: experienceFields,
+    append: appendExperience,
+    remove: removeExperience,
+  } = useFieldArray({
+    control,
+    name: "experiences",
+  });
+
+  const {
+    fields: educationFields,
+    append: appendEducation,
+    remove: removeEducation,
+  } = useFieldArray({
+    control,
+    name: "education",
+  });
+
+  const {
+    fields: projectFields,
+    append: appendProject,
+    remove: removeProject,
+  } = useFieldArray({
+    control,
+    name: "projects",
+  });
+
+  // Sync server profile to form
   useEffect(() => {
     if (serverProfile) {
       setProfile(serverProfile);
+      reset({
+        name: serverProfile.name,
+        title: serverProfile.title,
+        email: serverProfile.email,
+        phone: serverProfile.phone || "",
+        location: serverProfile.location || "",
+        summary: serverProfile.summary || "",
+        website: serverProfile.website || "",
+        github: serverProfile.github || "",
+        linkedin: serverProfile.linkedin || "",
+        portfolio: serverProfile.portfolio || "",
+        skills: serverProfile.skills || [],
+        technicalSkills: serverProfile.technicalSkills || [],
+        tools: serverProfile.tools || [],
+        experiences: serverProfile.experiences || [],
+        education: serverProfile.education || [],
+        projects: serverProfile.projects || [],
+      });
     }
-  }, [serverProfile]);
+  }, [serverProfile, reset]);
+
+  const profileData = watch();
 
   const canSave = useMemo(
-    () => !!(profile?.name && profile?.title && profile?.email),
-    [profile],
+    () =>
+      isDirty && !!(profileData.name && profileData.title && profileData.email),
+    [isDirty, profileData],
   );
 
-  const save = async () => {
+  const onSubmit = async (data: ProfileInput) => {
     if (!profile) return;
+    setError("");
     try {
-      await updateProfileMutation.mutateAsync(profile);
+      await updateProfileMutation.mutateAsync({
+        ...profile,
+        ...data,
+      } as any);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-    } catch (error) {
-      console.error("Failed to save profile:", error);
+      reset(data); // Mark as not dirty after save
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
   };
 
   const onUploadResume = async (file: File) => {
+    setError("");
     try {
       await uploadResumeMutation.mutateAsync(file);
-    } catch (error) {
-      console.error("Failed to upload resume:", error);
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
   };
 
   const onRemoveResume = async () => {
+    setError("");
     try {
       await deleteResumeMutation.mutateAsync();
-    } catch (error) {
-      console.error("Failed to remove resume:", error);
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
   };
 
@@ -92,33 +164,61 @@ export default function ProfilePage() {
     <main className="min-h-screen bg-light-gray pt-[78px]">
       <ProfileHeader
         completeness={completeness}
-        onSave={save}
+        onSave={handleSubmit(onSubmit)}
         canSave={canSave}
         saved={saved}
       />
 
       <div className="container py-10">
+        {error ? (
+          <div className="mb-6 border border-red-200 bg-red-50 text-red-700 px-4 py-3 rounded-none">
+            {error}
+          </div>
+        ) : null}
         <div className="flex flex-col lg:flex-row gap-8">
           <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
           <div className="flex-1 flex flex-col gap-6">
             {activeTab === "basic" && (
-              <BasicInfoSection profile={profile} setProfile={setProfile} />
+              <BasicInfoSection register={register} errors={errors} />
             )}
             {activeTab === "summary" && (
-              <SummarySection profile={profile} setProfile={setProfile} />
+              <SummarySection register={register} errors={errors} />
             )}
             {activeTab === "skills" && (
-              <SkillsSection profile={profile} setProfile={setProfile} />
+              <SkillsSection
+                setValue={setValue}
+                skills={profileData.skills || []}
+                technicalSkills={profileData.technicalSkills || []}
+                tools={profileData.tools || []}
+              />
             )}
             {activeTab === "experience" && (
-              <ExperienceSection profile={profile} setProfile={setProfile} />
+              <ExperienceSection
+                register={register}
+                errors={errors}
+                fields={experienceFields}
+                append={appendExperience}
+                remove={removeExperience}
+              />
             )}
             {activeTab === "education" && (
-              <EducationSection profile={profile} setProfile={setProfile} />
+              <EducationSection
+                register={register}
+                errors={errors}
+                fields={educationFields}
+                append={appendEducation}
+                remove={removeEducation}
+              />
             )}
             {activeTab === "projects" && (
-              <ProjectSection profile={profile} setProfile={setProfile} />
+              <ProjectSection
+                register={register}
+                errors={errors}
+                fields={projectFields}
+                append={appendProject}
+                remove={removeProject}
+              />
             )}
             {activeTab === "resume" && (
               <ResumeSection

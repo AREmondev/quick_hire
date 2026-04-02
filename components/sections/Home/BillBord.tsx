@@ -9,7 +9,7 @@ const BillBord = () => {
   return (
     <div className="flex overflow-hidden items-start py-18">
       <div className="container relative bg-primary">
-        <div className="h-[414px] w-full px-[70px]">
+        <div className="h-[414px] w-full px-10 lg:px-[70px]">
           <div className="max-w-[364px] flex flex-col gap-6 justify-center h-full">
             <Text variant={"h2"} fontFamily={"clash"} className="text-white">
               Start posting jobs today

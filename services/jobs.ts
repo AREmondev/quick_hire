@@ -1,6 +1,7 @@
 import type { Job, ApiSuccess } from "./types";
 import apiClient from "@/lib/axios";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
+import { handleApiError } from "@/lib/utils";
 
 export type JobsListParams = {
   page?: number;
@@ -18,83 +19,115 @@ export type JobsListParams = {
 };
 
 export async function getPublicJobs(params?: JobsListParams) {
-  const res = await apiClient.get<
-    ApiSuccess<{
-      items: Job[];
-      page: number;
-      pageSize: number;
-      total: number;
-      pageCount: number;
-    }>
-  >(API_ENDPOINTS.JOBS.PUBLIC_LIST, {
-    params: {
-      page: params?.page ?? 1,
-      pageSize: params?.pageSize ?? 20,
-      ...(params?.query && { query: params.query }),
-      ...(params?.location && { location: params.location }),
-      ...(params?.type && params.type.length > 0 && { type: params.type }),
-      ...(params?.experience &&
-        params.experience.length > 0 && { experience: params.experience }),
-      ...(params?.category &&
-        params.category.length > 0 && { category: params.category }),
-      ...(params?.remote && { remote: params.remote }),
-      ...(params?.featured && { featured: params.featured }),
-      ...(params?.salaryMin && { salaryMin: params.salaryMin }),
-      ...(params?.salaryMax && { salaryMax: params.salaryMax }),
-      ...(params?.sort && { sort: params.sort }),
-    },
-  });
-  return res.data.data;
+  try {
+    const res = await apiClient.get<
+      ApiSuccess<{
+        items: Job[];
+        page: number;
+        pageSize: number;
+        total: number;
+        pageCount: number;
+      }>
+    >(API_ENDPOINTS.JOBS.PUBLIC_LIST, {
+      params: {
+        page: params?.page ?? 1,
+        pageSize: params?.pageSize ?? 20,
+        ...(params?.query && { query: params.query }),
+        ...(params?.location && { location: params.location }),
+        ...(params?.type && params.type.length > 0 && { type: params.type }),
+        ...(params?.experience &&
+          params.experience.length > 0 && { experience: params.experience }),
+        ...(params?.category &&
+          params.category.length > 0 && { category: params.category }),
+        ...(params?.remote && { remote: params.remote }),
+        ...(params?.featured && { featured: params.featured }),
+        ...(params?.salaryMin && { salaryMin: params.salaryMin }),
+        ...(params?.salaryMax && { salaryMax: params.salaryMax }),
+        ...(params?.sort && { sort: params.sort }),
+      },
+    });
+    return res.data.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 }
 
 export async function getPublicJob(slug: string) {
-  const res = await apiClient.get<ApiSuccess<Job>>(
-    API_ENDPOINTS.JOBS.PUBLIC_DETAIL(slug),
-  );
-  return res.data.data;
+  try {
+    const res = await apiClient.get<ApiSuccess<Job>>(
+      API_ENDPOINTS.JOBS.PUBLIC_DETAIL(slug),
+    );
+    return res.data.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 }
 
 export async function getAdminJobs() {
-  const res = await apiClient.get<ApiSuccess<Job[]>>(
-    API_ENDPOINTS.JOBS.ADMIN_LIST,
-  );
-  return res.data.data;
+  try {
+    const res = await apiClient.get<ApiSuccess<Job[]>>(
+      API_ENDPOINTS.JOBS.ADMIN_LIST,
+    );
+    return res.data.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 }
 
 export async function createJob(payload: Partial<Job>) {
-  const res = await apiClient.post<ApiSuccess<Job>>(
-    API_ENDPOINTS.JOBS.ADMIN_CREATE,
-    payload,
-  );
-  return res.data.data;
+  try {
+    const res = await apiClient.post<ApiSuccess<Job>>(
+      API_ENDPOINTS.JOBS.ADMIN_CREATE,
+      payload,
+    );
+    return res.data.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 }
 
 export async function updateJob(id: string, payload: Partial<Job>) {
-  const res = await apiClient.patch<ApiSuccess<Job>>(
-    API_ENDPOINTS.JOBS.ADMIN_DETAIL(id),
-    payload,
-  );
-  return res.data.data;
+  try {
+    const res = await apiClient.patch<ApiSuccess<Job>>(
+      API_ENDPOINTS.JOBS.ADMIN_DETAIL(id),
+      payload,
+    );
+    return res.data.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 }
 
 export async function deleteJob(id: string) {
-  await apiClient.delete(API_ENDPOINTS.JOBS.ADMIN_DETAIL(id));
+  try {
+    await apiClient.delete(API_ENDPOINTS.JOBS.ADMIN_DETAIL(id));
+  } catch (error) {
+    return handleApiError(error);
+  }
 }
 
 export async function publishJob(id: string) {
-  const res = await apiClient.post<ApiSuccess<Job>>(
-    API_ENDPOINTS.JOBS.ADMIN_PUBLISH(id),
-    {},
-  );
-  return res.data.data;
+  try {
+    const res = await apiClient.post<ApiSuccess<Job>>(
+      API_ENDPOINTS.JOBS.ADMIN_PUBLISH(id),
+      {},
+    );
+    return res.data.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 }
 
 export async function unpublishJob(id: string) {
-  const res = await apiClient.post<ApiSuccess<Job>>(
-    API_ENDPOINTS.JOBS.ADMIN_UNPUBLISH(id),
-    {},
-  );
-  return res.data.data;
+  try {
+    const res = await apiClient.post<ApiSuccess<Job>>(
+      API_ENDPOINTS.JOBS.ADMIN_UNPUBLISH(id),
+      {},
+    );
+    return res.data.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 }
 
 export async function savedJob(id: string) {

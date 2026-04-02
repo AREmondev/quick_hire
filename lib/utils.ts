@@ -1,8 +1,42 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import axios from "axios";
 
 export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
+};
+
+/**
+ * Extracts a readable error message from an API error response.
+ * Handles the format: error.response.data.error.message
+ */
+export const getErrorMessage = (error: unknown): string => {
+  if (axios.isAxiosError(error)) {
+    // Check if the backend response has the expected structure
+    if (error.response?.data?.error?.message) {
+      return error.response.data.error.message;
+    }
+    // Fallback for Axios errors without the specific structure
+    return error.response?.data?.message || error.message;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  return "An unexpected error occurred. Please try again.";
+};
+
+/**
+ * Throws a formatted error from an API response
+ */
+export const handleApiError = (error: unknown): never => {
+  const message = getErrorMessage(error);
+  throw new Error(message);
 };
 
 export const scrollToTop = () => {

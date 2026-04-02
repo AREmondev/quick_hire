@@ -4,7 +4,7 @@ import { useSavedJobMutation, useUnSavedJobMutation } from "@/hooks/jobs";
 import Link from "next/link";
 import React, { useState } from "react";
 
-const JobInterection = ({
+export const JobInterection = ({
   slug,
   id,
   isSaved,
@@ -100,4 +100,87 @@ const JobInterection = ({
   );
 };
 
-export default JobInterection;
+export const MobileApplyActions = ({
+  slug,
+  id,
+  isSaved,
+  isApplied,
+  applicationId,
+}: {
+  slug: string;
+  id: string;
+  isSaved: boolean;
+  isApplied?: boolean;
+  applicationId?: string;
+}) => {
+  const [isSavedBookmarks, setIsSavedBookmarks] = useState(isSaved);
+  const saveJob = useSavedJobMutation(id);
+  const unSaveJob = useUnSavedJobMutation(id);
+  const toggleSaved = async () => {
+    try {
+      if (isSavedBookmarks) {
+        await unSaveJob.mutateAsync();
+        setIsSavedBookmarks(false);
+      } else {
+        await saveJob.mutateAsync();
+        setIsSavedBookmarks(true);
+      }
+    } catch (error) {
+      console.error("Failed to toggle save status:", error);
+    }
+  };
+  return (
+    <div className="fixed inset-x-0 bottom-0 lg:hidden bg-white border-t border-border p-4 z-50">
+      <div className="container flex gap-3">
+        {isApplied ? (
+          <Link href={`/applications/${applicationId}`} className="flex-1">
+            <Button className="w-full bg-green-500 hover:bg-green-600 border-none">
+              View Application
+            </Button>
+          </Link>
+        ) : (
+          <Link href={`/jobs/${slug}/apply`} className="flex-1">
+            <Button className="w-full">Apply Now</Button>
+          </Link>
+        )}
+        <button
+          onClick={async () => await toggleSaved()}
+          className="h-[50px] px-4 flex items-center gap-2 justify-center border border-primary text-primary font-semibold hover:bg-primary hover:text-white transition-colors"
+        >
+          <span>
+            {" "}
+            {isSavedBookmarks ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="#4640DE"
+                viewBox="0 0 24 24"
+                stroke="none"
+              >
+                <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                />
+              </svg>
+            )}
+          </span>
+          <span> {isSavedBookmarks ? "Remove" : "Save"}</span>
+        </button>
+      </div>
+    </div>
+  );
+};

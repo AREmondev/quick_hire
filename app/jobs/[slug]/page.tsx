@@ -8,6 +8,7 @@ import { JobContent } from "@/components/features/jobs/JobContent";
 import { JobSidebar } from "@/components/features/jobs/JobSidebar";
 import { serverFetch } from "@/lib/api/serverFetch";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
+import { MobileApplyActions } from "@/components/features/jobs/JobInterection";
 
 interface JobDetailsPageProps {
   params: Promise<{ slug: string }>;
@@ -85,27 +86,13 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
       </div>
 
       {/* Mobile sticky apply bar */}
-      <div className="fixed inset-x-0 bottom-0 lg:hidden bg-white border-t border-border p-4 z-50">
-        <div className="container flex gap-3">
-          {job.isApplied ? (
-            <Link
-              href={`/applications/${job.applicationId}`}
-              className="flex-1"
-            >
-              <Button className="w-full bg-green-500 hover:bg-green-600 border-none">
-                View Application
-              </Button>
-            </Link>
-          ) : (
-            <Link href={`/jobs/${job.slug}/apply`} className="flex-1">
-              <Button className="w-full">Apply Now</Button>
-            </Link>
-          )}
-          <button className="h-[50px] px-4 border border-primary text-primary font-semibold hover:bg-primary hover:text-white transition-colors">
-            Save
-          </button>
-        </div>
-      </div>
+      <MobileApplyActions
+        slug={slug}
+        id={job.id}
+        isSaved={job.isSaved || false}
+        isApplied={job.isApplied || false}
+        applicationId={job.applicationId || undefined}
+      />
     </main>
   );
 }

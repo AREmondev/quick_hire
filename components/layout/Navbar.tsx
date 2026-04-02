@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import type { User } from "@/lib/api/types";
-import { BsChevronDown } from "react-icons/bs";
+import { BsChevronDown, BsList, BsX } from "react-icons/bs";
 import dynamic from "next/dynamic";
 
 const ProfileDropdown = dynamic(() => import("./ProfileDropdown"), {
@@ -93,7 +93,7 @@ const Navbar = () => {
           })}
         </nav>
 
-        {/* Right actions */}
+        {/* Right actions (Desktop) */}
         <div className="hidden md:flex items-center gap-4">
           {!user ? (
             <>
@@ -116,7 +116,7 @@ const Navbar = () => {
                 onClick={toggleProfile}
                 className="flex items-center gap-3 group focus:outline-none"
               >
-                <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-semibold shadow-sm group-hover:bg-primary-dark transition-colors">
+                <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-semibold shadow-sm group-hover:bg-primary-dark transition-colors text-sm">
                   {initials}
                 </div>
                 <div className="flex flex-col items-start leading-tight">
@@ -148,31 +148,36 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          onClick={toggleMobile}
-          className="md:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5"
-          aria-label="Toggle menu"
-        >
-          <span
-            className={cn(
-              "w-6 h-0.5 bg-neutral-100 transition-all",
-              mobileOpen && "rotate-45 translate-y-2",
-            )}
-          />
-          <span
-            className={cn(
-              "w-6 h-0.5 bg-neutral-100 transition-all",
-              mobileOpen && "opacity-0",
-            )}
-          />
-          <span
-            className={cn(
-              "w-6 h-0.5 bg-neutral-100 transition-all",
-              mobileOpen && "-rotate-45 -translate-y-2",
-            )}
-          />
-        </button>
+        {/* Mobile actions */}
+        <div className="flex md:hidden items-center gap-3">
+          {!user ? (
+            <Link href="/auth/login">
+              <Button className="h-9 px-4 text-[13px]">Login</Button>
+            </Link>
+          ) : (
+            <div className="relative" ref={profileRef}>
+              <button
+                onClick={toggleProfile}
+                className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-semibold shadow-sm text-xs"
+              >
+                {initials}
+              </button>
+              {profileOpen && (
+                <div className="absolute right-0 top-full mt-2">
+                  <ProfileDropdown user={user} onClose={closeProfile} />
+                </div>
+              )}
+            </div>
+          )}
+
+          <button
+            onClick={toggleMobile}
+            className="w-9 h-9 flex items-center justify-center text-neutral-100 focus:outline-none"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <BsX size={28} /> : <BsList size={28} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}

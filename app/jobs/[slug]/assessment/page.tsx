@@ -14,6 +14,7 @@ import { AssessmentFooter } from "@/components/features/jobs/AssessmentFooter";
 import { usePublicJobQuery } from "@/hooks/jobs";
 import { AssessmentQuestion } from "@/services/types";
 import Loading from "@/components/ui/Loading";
+import { getErrorMessage } from "@/lib/utils";
 
 interface AssessmentPageProps {
   params: Promise<{ slug: string }>;
@@ -35,6 +36,7 @@ export default function AssessmentPage({ params }: AssessmentPageProps) {
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const questions = job?.assessment?.questions || [];
   const [steps, setSteps] = useState<
@@ -75,6 +77,7 @@ export default function AssessmentPage({ params }: AssessmentPageProps) {
   const handleSubmit = async () => {
     if (!applicationId || !session?.accessToken) return;
     setLoading(true);
+    setError("");
     try {
       const formattedAnswers = {
         answers: Object.entries(answers).map(([question_id, answer]) => ({
@@ -84,8 +87,8 @@ export default function AssessmentPage({ params }: AssessmentPageProps) {
       };
       await submitCandidateApplication(applicationId, formattedAnswers);
       router.push(`/jobs/${slug}/submit?applicationId=${applicationId}`);
-    } catch (error) {
-      console.error("Failed to submit application:", error);
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -137,6 +140,12 @@ export default function AssessmentPage({ params }: AssessmentPageProps) {
 
       <div className="container py-12 max-w-4xl mx-auto">
         <ProgressSteps steps={steps} />
+
+        {error ? (
+          <div className="mb-6 border border-red-200 bg-red-50 text-red-700 px-4 py-3 rounded-none">
+            {error}
+          </div>
+        ) : null}
 
         <AssessmentHeader currentStep={2} totalSteps={3} jobTitle={job.title} />
 

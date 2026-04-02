@@ -11,6 +11,7 @@ import { ProgressSteps } from "@/components/features/jobs/ProgressSteps";
 import { usePublicJobQuery } from "@/hooks/jobs";
 import { BsCheckCircle } from "react-icons/bs";
 import Loading from "@/components/ui/Loading";
+import { getErrorMessage } from "@/lib/utils";
 
 interface SubmitPageProps {
   params: Promise<{ slug: string }>;
@@ -32,6 +33,7 @@ export default function SubmitPage({ params }: SubmitPageProps) {
 
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
   const [steps, setSteps] = useState<
     { label: string; active: boolean; done: boolean }[]
   >([]);
@@ -56,6 +58,7 @@ export default function SubmitPage({ params }: SubmitPageProps) {
   const handleSubmit = async () => {
     if (!applicationId || !session?.accessToken) return;
     setLoading(true);
+    setError("");
     try {
       await submitApplication(applicationId);
       setSubmitted(true);
@@ -73,8 +76,8 @@ export default function SubmitPage({ params }: SubmitPageProps) {
           { label: "Submit Application", active: false, done: true },
         ]);
       }
-    } catch (error) {
-      console.error("Failed to submit application:", error);
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -125,6 +128,12 @@ export default function SubmitPage({ params }: SubmitPageProps) {
 
       <div className="container py-12 max-w-4xl mx-auto">
         <ProgressSteps steps={steps} />
+
+        {error ? (
+          <div className="mb-6 border border-red-200 bg-red-50 text-red-700 px-4 py-3 rounded-none">
+            {error}
+          </div>
+        ) : null}
 
         <div className="bg-white border border-border p-8 md:p-12 shadow-sm text-center">
           {submitted ? (

@@ -2,6 +2,7 @@
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { Text } from "@/components/ui/Text";
+import { Button } from "@/components/ui/Button";
 import { usePublicJobsQuery } from "@/hooks/jobs";
 import { useDebounce } from "@/hooks/useDebounce";
 import { JobFilters } from "@/components/features/jobs/JobFilters";
@@ -11,6 +12,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import { Category, ExperienceLevel, JobType } from "@/services/types";
 import Loading from "@/components/ui/Loading";
+import { BsFilter } from "react-icons/bs";
 
 const SORT_OPTIONS = [
   { label: "Newest", value: "postedAt:desc" },
@@ -35,6 +37,7 @@ function JobsPageContent() {
   const [salaryRange, setSalaryRange] = useState<[number, number]>([0, 200000]);
   const [sortBy, setSortBy] = useState<string | undefined>("postedAt:desc");
   const [page, setPage] = useState(1);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -135,9 +138,23 @@ function JobsPageContent() {
       </div>
 
       <div className="container py-10">
+        {/* Mobile Filter Toggle */}
+        <div className="lg:hidden mb-6">
+          <Button
+            variant="white"
+            onClick={() => setShowMobileFilters(true)}
+            className="w-full flex items-center justify-center gap-2 border border-border"
+          >
+            <BsFilter size={20} />
+            Filters
+          </Button>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Filters Sidebar */}
           <JobFilters
+            showMobile={showMobileFilters}
+            onCloseMobile={() => setShowMobileFilters(false)}
             search={search}
             setSearch={setSearch}
             location={location}

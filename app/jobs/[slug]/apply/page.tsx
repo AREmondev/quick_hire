@@ -14,6 +14,7 @@ import { ResumeSourceSelection } from "@/components/features/jobs/ResumeSourceSe
 import { ApplyActions } from "@/components/features/jobs/ApplyActions";
 import { usePublicJobQuery } from "@/hooks/jobs";
 import Loading from "@/components/ui/Loading";
+import { getErrorMessage } from "@/lib/utils";
 
 interface ApplyPageProps {
   params: Promise<{ slug: string }>;
@@ -31,6 +32,7 @@ export default function ApplyPage({ params }: ApplyPageProps) {
     "profile",
   );
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [steps, setSteps] = useState<
     { label: string; active: boolean; done: boolean }[]
   >([]);
@@ -55,6 +57,7 @@ export default function ApplyPage({ params }: ApplyPageProps) {
   const handleContinue = async () => {
     if (!job?.id || !session?.accessToken) return;
     setLoading(true);
+    setError("");
     try {
       const app = await createApplicationForJob(job.id, {
         resumeSource,
@@ -68,8 +71,8 @@ export default function ApplyPage({ params }: ApplyPageProps) {
           router.push(`/jobs/${slug}/submit?applicationId=${app.id}`);
         }
       }
-    } catch (error) {
-      console.error("Failed to create application:", error);
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -130,6 +133,12 @@ export default function ApplyPage({ params }: ApplyPageProps) {
             Choose how you would like to present your professional experience to
             the hiring team.
           </Text>
+
+          {error ? (
+            <div className="mb-6 border border-red-200 bg-red-50 text-red-700 px-4 py-3 rounded-none">
+              {error}
+            </div>
+          ) : null}
 
           <ApplyJobSummary job={job} />
 

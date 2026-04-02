@@ -1,44 +1,59 @@
 import { Text } from "@/components/ui/Text";
 import { Button } from "@/components/ui/Button";
-import { useState } from "react";
+import { useState, forwardRef } from "react";
+import { cn } from "@/lib/utils";
 
-export const FormInput = ({
-  label,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) => (
+export const FormInput = forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement> & { label: string; error?: string }
+>(({ label, error, ...props }, ref) => (
   <div className="flex flex-col gap-1.5">
     <label className="text-[13px] font-semibold text-neutral-80 uppercase tracking-wide">
       {label}
     </label>
     <input
       {...props}
-      className={[
+      ref={ref}
+      className={cn(
         "h-11 w-full border border-border bg-white px-4 text-neutral-100 text-[15px]",
         "placeholder:text-neutral-60 focus:outline-none focus:border-primary transition-colors",
-        props.className || "",
-      ].join(" ")}
+        error && "border-red-500 focus:border-red-500",
+        props.className
+      )}
     />
+    {error && (
+      <p className="text-xs text-red-500 font-medium">{error}</p>
+    )}
   </div>
-);
+));
 
-export const FormTextArea = ({
-  label,
-  ...props
-}: React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string }) => (
+FormInput.displayName = "FormInput";
+
+export const FormTextArea = forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string; error?: string }
+>(({ label, error, ...props }, ref) => (
   <div className="flex flex-col gap-1.5">
     <label className="text-[13px] font-semibold text-neutral-80 uppercase tracking-wide">
       {label}
     </label>
     <textarea
       {...props}
-      className={[
+      ref={ref}
+      className={cn(
         "min-h-28 w-full border border-border bg-white p-4 text-neutral-100 text-[15px]",
         "placeholder:text-neutral-60 focus:outline-none focus:border-primary transition-colors resize-none",
-        props.className || "",
-      ].join(" ")}
+        error && "border-red-500 focus:border-red-500",
+        props.className
+      )}
     />
+    {error && (
+      <p className="text-xs text-red-500 font-medium">{error}</p>
+    )}
   </div>
-);
+));
+
+FormTextArea.displayName = "FormTextArea";
 
 export const SectionCard = ({
   title,

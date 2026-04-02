@@ -1,46 +1,67 @@
-import { Profile } from "@/services/types";
+import { UseFormSetValue } from "react-hook-form";
+import { ProfileInput } from "@/lib/validations";
 import { TagInput, SectionCard } from "./FormComponents";
 
 interface SkillsSectionProps {
-  profile: Profile;
-  setProfile: (p: Profile) => void;
+  setValue: UseFormSetValue<ProfileInput>;
+  skills: string[];
+  technicalSkills: string[];
+  tools: string[];
 }
 
-export function SkillsSection({ profile, setProfile }: SkillsSectionProps) {
+export function SkillsSection({
+  setValue,
+  skills,
+  technicalSkills,
+  tools,
+}: SkillsSectionProps) {
   const addSkill = (v: string) => {
-    if (!profile.skills.includes(v))
-      setProfile({ ...profile, skills: [...profile.skills, v] });
+    if (!skills.includes(v)) {
+      setValue("skills", [...skills, v], { shouldDirty: true });
+    }
   };
-  const removeSkill = (v: string) =>
-    setProfile({ ...profile, skills: profile.skills.filter((s) => s !== v) });
+  const removeSkill = (v: string) => {
+    setValue(
+      "skills",
+      skills.filter((s) => s !== v),
+      { shouldDirty: true },
+    );
+  };
 
   const addTech = (v: string) => {
-    const arr = profile.technicalSkills || [];
-    if (!arr.includes(v))
-      setProfile({ ...profile, technicalSkills: [...arr, v] });
+    if (!technicalSkills.includes(v)) {
+      setValue("technicalSkills", [...technicalSkills, v], {
+        shouldDirty: true,
+      });
+    }
   };
-  const removeTech = (v: string) =>
-    setProfile({
-      ...profile,
-      technicalSkills: (profile.technicalSkills || []).filter((s) => s !== v),
-    });
+  const removeTech = (v: string) => {
+    setValue(
+      "technicalSkills",
+      technicalSkills.filter((s) => s !== v),
+      { shouldDirty: true },
+    );
+  };
 
   const addTool = (v: string) => {
-    const arr = profile.tools || [];
-    if (!arr.includes(v)) setProfile({ ...profile, tools: [...arr, v] });
+    if (!tools.includes(v)) {
+      setValue("tools", [...tools, v], { shouldDirty: true });
+    }
   };
-  const removeTool = (v: string) =>
-    setProfile({
-      ...profile,
-      tools: (profile.tools || []).filter((s) => s !== v),
-    });
+  const removeTool = (v: string) => {
+    setValue(
+      "tools",
+      tools.filter((s) => s !== v),
+      { shouldDirty: true },
+    );
+  };
 
   return (
     <>
       <SectionCard title="Soft Skills">
         <TagInput
           label="Add Skill"
-          tags={profile.skills}
+          tags={skills}
           placeholder="e.g. Leadership, Communication"
           onAdd={addSkill}
           onRemove={removeSkill}
@@ -49,7 +70,7 @@ export function SkillsSection({ profile, setProfile }: SkillsSectionProps) {
       <SectionCard title="Technical Skills">
         <TagInput
           label="Add Technical Skill"
-          tags={profile.technicalSkills || []}
+          tags={technicalSkills}
           placeholder="e.g. React, TypeScript, GraphQL"
           onAdd={addTech}
           onRemove={removeTech}
@@ -58,7 +79,7 @@ export function SkillsSection({ profile, setProfile }: SkillsSectionProps) {
       <SectionCard title="Tools & Software">
         <TagInput
           label="Add Tool"
-          tags={profile.tools || []}
+          tags={tools}
           placeholder="e.g. Figma, VS Code, Docker"
           onAdd={addTool}
           onRemove={removeTool}

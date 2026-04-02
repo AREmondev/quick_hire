@@ -22,7 +22,7 @@ export const textVariants = cva("text-neutral-80", {
     variant: {
       /* Headings */
 
-      h1: "text-[72px] leading-[79px] font-semibold",
+      h1: "text-[48px] leading-[55px] xl:text-[72px] xl:leading-[79px] font-semibold",
 
       h2: "text-[26px] sm:text-[32px]  md:text-[48px] md:leading-[53px] font-semibold",
 

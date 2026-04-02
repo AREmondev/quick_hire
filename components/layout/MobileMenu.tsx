@@ -39,40 +39,6 @@ const MobileMenu = ({
             </Link>
           );
         })}
-        {!user ? (
-          <div className="flex gap-3 mt-4 pt-4 border-t border-border">
-            <Link href="/auth/login" className="flex-1">
-              <Button variant="transparent" className="w-full">
-                Login
-              </Button>
-            </Link>
-            <Link href="/auth/register" className="flex-1">
-              <Button className="w-full">Sign Up</Button>
-            </Link>
-          </div>
-        ) : (
-          <>
-            <Link
-              href="/profile"
-              onClick={onClose}
-              className="mt-4 pt-4 border-t border-border flex items-center gap-3 px-4 py-3"
-            >
-              <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold">
-                {initials}
-              </div>
-              <span className="text-neutral-100 font-semibold">{user.name}</span>
-            </Link>
-            <button
-              onClick={() => {
-                onClose();
-                signOut({ callbackUrl: "/" });
-              }}
-              className="px-4 py-3 font-medium text-[15px] text-accent-red hover:bg-accent-red/5 transition-colors text-left"
-            >
-              Logout
-            </button>
-          </>
-        )}
       </div>
     </div>
   );
