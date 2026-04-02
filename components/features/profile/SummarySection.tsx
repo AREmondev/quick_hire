@@ -1,16 +1,33 @@
-import { UseFormRegister, FieldErrors } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { ProfileInput } from "@/lib/validations";
 import { Text } from "@/components/ui/Text";
-import { FormTextArea, SectionCard } from "./FormComponents";
+import { FormTextArea, SectionCardWithFooter } from "./FormComponents";
+import { Button } from "@/components/ui/Button";
 
-interface SummarySectionProps {
-  register: UseFormRegister<ProfileInput>;
-  errors: FieldErrors<ProfileInput>;
-}
+export function SummarySection() {
+  const {
+    register,
+    formState: { errors, dirtyFields },
+    handleSubmit,
+  } = useFormContext<ProfileInput>();
 
-export function SummarySection({ register, errors }: SummarySectionProps) {
+  const isDirty = !!dirtyFields.summary;
+
+  const onSave = (data: ProfileInput) => {
+    console.log("Saving summary:", data.summary);
+  };
+
   return (
-    <SectionCard title="Professional Summary">
+    <SectionCardWithFooter
+      title="Professional Summary"
+      footer={
+        isDirty && (
+          <Button onClick={handleSubmit(onSave)} isLoading={false}>
+            Save Summary
+          </Button>
+        )
+      }
+    >
       <FormTextArea
         label="Summary"
         placeholder="Write a compelling 2-4 sentence summary highlighting your experience, key skills, and career goals..."
@@ -27,6 +44,6 @@ export function SummarySection({ register, errors }: SummarySectionProps) {
           expertise, and end with what you&apos;re looking for next.
         </Text>
       </div>
-    </SectionCard>
+    </SectionCardWithFooter>
   );
 }

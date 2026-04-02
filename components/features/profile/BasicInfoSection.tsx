@@ -1,15 +1,33 @@
-import { UseFormRegister, FieldErrors } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { ProfileInput } from "@/lib/validations";
-import { FormInput, SectionCard } from "./FormComponents";
+import { FormInput, SectionCardWithFooter } from "./FormComponents";
+import { Button } from "@/components/ui/Button";
 
-interface BasicInfoSectionProps {
-  register: UseFormRegister<ProfileInput>;
-  errors: FieldErrors<ProfileInput>;
-}
+export function BasicInfoSection() {
+  const {
+    register,
+    formState: { errors, dirtyFields },
+    handleSubmit,
+  } = useFormContext<ProfileInput>();
 
-export function BasicInfoSection({ register, errors }: BasicInfoSectionProps) {
+  const isDirty = !!Object.keys(dirtyFields).length;
+
+  const onSave = (data: ProfileInput) => {
+    // Here you would trigger an API call to save the basic info
+    console.log("Saving basic info:", data);
+  };
+
   return (
-    <SectionCard title="Basic Information">
+    <SectionCardWithFooter
+      title="Basic Information"
+      footer={
+        isDirty && (
+          <Button onClick={handleSubmit(onSave)} isLoading={false}>
+            Save Changes
+          </Button>
+        )
+      }
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <FormInput
           label="Full Name *"
@@ -67,6 +85,6 @@ export function BasicInfoSection({ register, errors }: BasicInfoSectionProps) {
           error={errors.portfolio?.message}
         />
       </div>
-    </SectionCard>
+    </SectionCardWithFooter>
   );
 }

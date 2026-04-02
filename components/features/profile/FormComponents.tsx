@@ -55,14 +55,16 @@ export const FormTextArea = forwardRef<
 
 FormTextArea.displayName = "FormTextArea";
 
-export const SectionCard = ({
+export const SectionCardWithFooter = ({
   title,
   action,
   children,
+  footer,
 }: {
   title: string;
   action?: React.ReactNode;
   children: React.ReactNode;
+  footer?: React.ReactNode;
 }) => (
   <div className="bg-white border border-border">
     <div className="px-8 py-5 border-b border-border flex items-center justify-between">
@@ -72,6 +74,11 @@ export const SectionCard = ({
       {action}
     </div>
     <div className="p-8">{children}</div>
+    {footer && (
+      <div className="px-8 py-4 border-t border-border bg-light-gray flex justify-end">
+        {footer}
+      </div>
+    )}
   </div>
 );
 
@@ -81,12 +88,14 @@ export const TagInput = ({
   placeholder,
   onAdd,
   onRemove,
+  isLoading,
 }: {
   label: string;
   tags: string[];
   placeholder: string;
   onAdd: (val: string) => void;
   onRemove: (val: string) => void;
+  isLoading?: boolean;
 }) => {
   const [input, setInput] = useState("");
   const handleAdd = () => {
@@ -113,7 +122,12 @@ export const TagInput = ({
           placeholder={placeholder}
           className="flex-1 h-11 border border-border bg-white px-4 text-neutral-100 text-[15px] placeholder:text-neutral-60 focus:outline-none focus:border-primary transition-colors"
         />
-        <Button onClick={handleAdd} type="button" className="h-11 px-5">
+        <Button
+          onClick={handleAdd}
+          type="button"
+          className="h-11 px-5"
+          isLoading={isLoading}
+        >
           Add
         </Button>
       </div>

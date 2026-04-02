@@ -1,58 +1,64 @@
-import { UseFormSetValue } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
+import { useUpdateProfileMutation } from "@/hooks/profile";
+import { useToast } from "@/hooks/useToast";
 import { ProfileInput } from "@/lib/validations";
-import { TagInput, SectionCard } from "./FormComponents";
+import {
+  TagInput,
+  SectionCardWithFooter as SectionCard,
+} from "./FormComponents";
 
-interface SkillsSectionProps {
-  setValue: UseFormSetValue<ProfileInput>;
-  skills: string[];
-  technicalSkills: string[];
-  tools: string[];
-}
+export function SkillsSection() {
+  const { setValue, watch } = useFormContext<ProfileInput>();
+  const mutation = useUpdateProfileMutation();
+  const { show } = useToast();
 
-export function SkillsSection({
-  setValue,
-  skills,
-  technicalSkills,
-  tools,
-}: SkillsSectionProps) {
+  const skills = watch("skills") || [];
+  const technicalSkills = watch("technicalSkills") || [];
+  const tools = watch("tools") || [];
+
+  const handleUpdate = async (field: keyof ProfileInput, value: string[]) => {
+    try {
+      await mutation.mutateAsync({ [field]: value } as any);
+      setValue(field, value, { shouldDirty: true });
+      show("Skills updated successfully!", "success");
+    } catch (error) {
+      show("Failed to update skills.", "error");
+    }
+  };
+
   const addSkill = (v: string) => {
     if (!skills.includes(v)) {
-      setValue("skills", [...skills, v], { shouldDirty: true });
+      handleUpdate("skills", [...skills, v]);
     }
   };
   const removeSkill = (v: string) => {
-    setValue(
+    handleUpdate(
       "skills",
       skills.filter((s) => s !== v),
-      { shouldDirty: true },
     );
   };
 
   const addTech = (v: string) => {
     if (!technicalSkills.includes(v)) {
-      setValue("technicalSkills", [...technicalSkills, v], {
-        shouldDirty: true,
-      });
+      handleUpdate("technicalSkills", [...technicalSkills, v]);
     }
   };
   const removeTech = (v: string) => {
-    setValue(
+    handleUpdate(
       "technicalSkills",
       technicalSkills.filter((s) => s !== v),
-      { shouldDirty: true },
     );
   };
 
   const addTool = (v: string) => {
     if (!tools.includes(v)) {
-      setValue("tools", [...tools, v], { shouldDirty: true });
+      handleUpdate("tools", [...tools, v]);
     }
   };
   const removeTool = (v: string) => {
-    setValue(
+    handleUpdate(
       "tools",
       tools.filter((s) => s !== v),
-      { shouldDirty: true },
     );
   };
 
@@ -65,6 +71,7 @@ export function SkillsSection({
           placeholder="e.g. Leadership, Communication"
           onAdd={addSkill}
           onRemove={removeSkill}
+          isLoading={mutation.isPending}
         />
       </SectionCard>
       <SectionCard title="Technical Skills">
@@ -74,6 +81,7 @@ export function SkillsSection({
           placeholder="e.g. React, TypeScript, GraphQL"
           onAdd={addTech}
           onRemove={removeTech}
+          isLoading={mutation.isPending}
         />
       </SectionCard>
       <SectionCard title="Tools & Software">
@@ -83,6 +91,7 @@ export function SkillsSection({
           placeholder="e.g. Figma, VS Code, Docker"
           onAdd={addTool}
           onRemove={removeTool}
+          isLoading={mutation.isPending}
         />
       </SectionCard>
     </>
