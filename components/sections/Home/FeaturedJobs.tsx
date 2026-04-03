@@ -14,18 +14,23 @@ const FeaturedJobs = async () => {
   return (
     <section className="w-full overflow-hidden py-18">
       <div className="container">
-        <div className="flex flex-col gap-12">
+        <div className="flex flex-col gap-6 sm:gap-12">
           <div className="flex flex-wrap items-end gap-10 justify-between">
             <Text variant={"h2"} fontFamily={"clash"}>
               Featured <span className="text-accent-blue">jobs</span>
             </Text>
-            <LinkButton href="/jobs">Show all jobs</LinkButton>
+            <LinkButton className="hidden sm:block" href="/jobs">
+              Show all jobs
+            </LinkButton>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {jobs?.items.map((job, index) => (
               <JobCard job={job} key={index} />
             ))}
           </div>
+          <LinkButton className="block sm:hidden" href="/jobs">
+            Show all jobs
+          </LinkButton>
         </div>
       </div>
     </section>

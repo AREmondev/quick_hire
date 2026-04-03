@@ -1,6 +1,7 @@
 import { Badge, OutlineBadge } from "@/components/ui/Badge";
 import LinkButton from "@/components/ui/LinkButton";
 import { Text } from "@/components/ui/Text";
+import { IMAGES } from "@/lib/constants";
 import { categoryColors } from "@/lib/jobs";
 import { calculateDaysAgo } from "@/lib/utils";
 import { getJobs } from "@/services/serverApi";
@@ -12,14 +13,16 @@ const LatestJobs = async () => {
   const jobs = await getJobs({ featured: true });
   console.log("featured", jobs);
   return (
-    <section className="w-full overflow-hidden pt-18 pb-20 bg-light-gray">
+    <section className="w-full relative overflow-hidden pt-18 pb-20 bg-light-gray">
       <div className="container">
-        <div className="flex flex-col gap-12">
+        <div className="flex flex-col gap-6 sm:gap-12">
           <div className="flex flex-wrap items-end gap-10 justify-between">
             <Text variant={"h2"} fontFamily={"clash"}>
               Latest <span className="text-accent-blue">jobs</span>
             </Text>
-            <LinkButton href="/jobs">Show all jobs</LinkButton>
+            <LinkButton className="hidden sm:block" href="/jobs">
+              Show all jobs df
+            </LinkButton>
           </div>
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-y-4 gap-x-8">
             {jobs.items.map((job) => (
@@ -88,7 +91,19 @@ const LatestJobs = async () => {
               </Link>
             ))}
           </div>
+          <LinkButton className="block sm:hidden" href="/jobs">
+            Show all jobs
+          </LinkButton>
         </div>
+      </div>
+      <div className="absolute hidden md:block right-0 z-1 w-[480px] bottom-0 md:top-0 md:w-[900px]">
+        <Image
+          src={IMAGES.HERO_PATTERN}
+          alt="hero pattern"
+          width={900}
+          height={800}
+          priority
+        />
       </div>
     </section>
   );

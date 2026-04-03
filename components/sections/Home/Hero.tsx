@@ -42,7 +42,7 @@ const Hero = () => {
           />
         </div>
       </div>
-      <div className="absolute xl:block hidden right-0 z-1 top-0 w-[900px]">
+      <div className="absolute  right-0 z-1 w-[480px] bottom-0 md:top-0 md:w-[900px]">
         <Image
           src={IMAGES.HERO_PATTERN}
           alt="hero pattern"

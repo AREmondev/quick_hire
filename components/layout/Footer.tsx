@@ -4,141 +4,110 @@ import Image from "next/image";
 import { Text } from "@/components/ui/Text";
 import { Button } from "@/components/ui/Button";
 import { IMAGES } from "@/lib/constants";
-
+export const footerMenu = [
+  {
+    title: "About",
+    items: [
+      {
+        label: "Companies",
+        href: "#companies",
+        className: "text-neutral-20 hover:text-white",
+      },
+      {
+        label: "Pricing",
+        href: "#pricing",
+        className: "text-neutral-60 hover:text-white",
+      },
+      {
+        label: "Terms",
+        href: "#terms",
+        className: "text-neutral-60 hover:text-white",
+      },
+      {
+        label: "Advice",
+        href: "#advice",
+        className: "text-neutral-60 hover:text-white",
+      },
+      {
+        label: "Privacy Policy",
+        href: "#privacy",
+        className: "text-neutral-60 hover:text-white",
+      },
+    ],
+  },
+  {
+    title: "Resources",
+    items: [
+      {
+        label: "Help Docs",
+        href: "#docs",
+        className: "text-neutral-60 hover:text-white",
+      },
+      {
+        label: "Guide",
+        href: "#guide",
+        className: "text-neutral-60 hover:text-white",
+      },
+      {
+        label: "Updates",
+        href: "#updates",
+        className: "text-neutral-60 hover:text-white",
+      },
+      {
+        label: "Contact Us",
+        href: "#contact",
+        className: "text-neutral-60 hover:text-white",
+      },
+    ],
+  },
+];
 const Footer = () => {
   return (
     <footer className="w-full bg-black text-white">
       <div className="container py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-8">
             <div className="flex items-center gap-3">
               <Image
-                src={IMAGES.LOGO}
-                width={32}
+                src={IMAGES.LOGO_WHITE}
+                width={120}
                 height={32}
                 alt="QuickHire logo"
               />
-              <Text className="font-semibold" variant="title_lg">
-                QuickHire
-              </Text>
             </div>
-            <Text className="text-neutral-60 max-w-xs" variant="body_sm">
+            <Text className="text-neutral-20 max-w-xs" variant="body_sm">
               Great platform for the job seeker that passionate about startups.
               Find your dream job easier.
             </Text>
           </div>
+          {footerMenu.map((section) => (
+            <div key={section.title} className="flex flex-col gap-4">
+              <Text className=" text-neutral-0" variant="body_lg">
+                {section.title}
+              </Text>
+
+              <ul className="flex flex-col gap-3">
+                {section.items.map((item) => (
+                  <li key={item.label}>
+                    <Link href={item.href}>
+                      <Text
+                        className="text-neutral-20 hover:text-white transition-colors"
+                        variant="body_sm"
+                      >
+                        {item.label}
+                      </Text>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
 
           <div className="flex flex-col gap-4">
-            <Text className="font-semibold" variant="title_lg">
-              About
-            </Text>
-            <ul className="flex flex-col gap-3">
-              <li>
-                <Link href="#companies">
-                  <Text
-                    className="text-neutral-60 hover:text-white transition-colors"
-                    variant="body_sm"
-                  >
-                    Companies
-                  </Text>
-                </Link>
-              </li>
-              <li>
-                <Link href="#pricing">
-                  <Text
-                    className="text-neutral-60 hover:text-white transition-colors"
-                    variant="body_sm"
-                  >
-                    Pricing
-                  </Text>
-                </Link>
-              </li>
-              <li>
-                <Link href="#terms">
-                  <Text
-                    className="text-neutral-60 hover:text-white transition-colors"
-                    variant="body_sm"
-                  >
-                    Terms
-                  </Text>
-                </Link>
-              </li>
-              <li>
-                <Link href="#advice">
-                  <Text
-                    className="text-neutral-60 hover:text-white transition-colors"
-                    variant="body_sm"
-                  >
-                    Advice
-                  </Text>
-                </Link>
-              </li>
-              <li>
-                <Link href="#privacy">
-                  <Text
-                    className="text-neutral-60 hover:text-white transition-colors"
-                    variant="body_sm"
-                  >
-                    Privacy Policy
-                  </Text>
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <Text className="font-semibold" variant="title_lg">
-              Resources
-            </Text>
-            <ul className="flex flex-col gap-3">
-              <li>
-                <Link href="#docs">
-                  <Text
-                    className="text-neutral-60 hover:text-white transition-colors"
-                    variant="body_sm"
-                  >
-                    Help Docs
-                  </Text>
-                </Link>
-              </li>
-              <li>
-                <Link href="#guide">
-                  <Text
-                    className="text-neutral-60 hover:text-white transition-colors"
-                    variant="body_sm"
-                  >
-                    Guide
-                  </Text>
-                </Link>
-              </li>
-              <li>
-                <Link href="#updates">
-                  <Text
-                    className="text-neutral-60 hover:text-white transition-colors"
-                    variant="body_sm"
-                  >
-                    Updates
-                  </Text>
-                </Link>
-              </li>
-              <li>
-                <Link href="#contact">
-                  <Text
-                    className="text-neutral-60 hover:text-white transition-colors"
-                    variant="body_sm"
-                  >
-                    Contact Us
-                  </Text>
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <Text className="font-semibold" variant="title_lg">
+            <Text className="text-neutral-0" variant="body_lg">
               Get job notifications
             </Text>
-            <Text className="text-neutral-60" variant="body_sm">
+            <Text className="text-neutral-20" variant="body_sm">
               The latest job news, articles, sent to your inbox weekly.
             </Text>
             <form
@@ -153,12 +122,9 @@ const Footer = () => {
                 type="email"
                 required
                 placeholder="Email Address"
-                className="h-12 rounded-lg sm:rounded-l-lg sm:rounded-r-none px-4 text-black placeholder:text-neutral-60 w-full bg-white"
+                className="h-12 flex-auto px-4 sm:min-w-[200px] text-black placeholder:text-neutral-60 w-full bg-white"
               />
-              <Button
-                className="h-12 sm:rounded-l-none sm:rounded-r-lg bg-primary text-white"
-                type="submit"
-              >
+              <Button className="h-12  bg-primary text-white" type="submit">
                 Subscribe
               </Button>
             </form>
@@ -166,23 +132,27 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="border-t border-neutral-60/20">
-        <div className="container py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <Text className="text-neutral-60" variant="body_sm">
-            © {new Date().getFullYear()} QuickHire. All rights reserved.
-          </Text>
-          <div className="flex items-center gap-3">
-            {["f", "ig", "db", "in", "tw"].map((label) => (
-              <a
-                key={label}
-                href="#"
-                aria-label={label}
-                className="w-10 h-10 rounded-full border border-neutral-60/30 inline-flex items-center justify-center text-white hover:bg-primary transition-colors"
-              >
-                <span className="text-sm uppercase">{label}</span>
-              </a>
-            ))}
-          </div>
+      <div className="container border-t border-neutral-60/20 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <Text className="text-neutral-60" variant="body_sm">
+          © {new Date().getFullYear()} QuickHire. All rights reserved.
+        </Text>
+        <div className="flex items-center gap-3">
+          {[
+            IMAGES.FACEBOOK,
+            IMAGES.INSTAGRAM,
+            IMAGES.LINKEDIN,
+            IMAGES.TWITTER,
+            IMAGES.DRIBBL,
+          ].map((label) => (
+            <a
+              key={label}
+              href="#"
+              aria-label={label}
+              className="w-10 h-10 rounded-full border border-neutral-60/30 inline-flex items-center justify-center text-white hover:bg-primary transition-colors"
+            >
+              <Image src={label} width={10} height={10} alt="" />
+            </a>
+          ))}
         </div>
       </div>
     </footer>
