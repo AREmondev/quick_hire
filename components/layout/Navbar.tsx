@@ -72,37 +72,39 @@ const Navbar = () => {
     <header className="w-full fixed top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border py-[14px]">
       <div className="container flex items-center justify-between gap-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <Image
-            src={IMAGES.LOGO}
-            alt="QuickHire logo"
-            width={120}
-            height={40}
-          />
-        </Link>
+        <div className="flex items-center gap-12">
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <Image
+              src={IMAGES.LOGO}
+              alt="QuickHire logo"
+              width={120}
+              height={40}
+            />
+          </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1">
-          {NAV_LINKS.map((link) => {
-            const isActive =
-              pathname === link.href || pathname.startsWith(link.href + "/");
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  textVariants({ variant: "body_md" }),
-                  "px-4 py-2 transition-colors font-medium",
-                  isActive
-                    ? "text-primary bg-primary/5"
-                    : "text-neutral-60 hover:text-neutral-100",
-                )}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1">
+            {NAV_LINKS.map((link) => {
+              const isActive =
+                pathname === link.href || pathname.startsWith(link.href + "/");
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    textVariants({ variant: "body_md" }),
+                    "px-4 py-2 transition-colors font-medium",
+                    isActive
+                      ? "text-primary bg-primary/5"
+                      : "text-neutral-60 hover:text-neutral-100",
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
 
         {/* Right actions (Desktop) */}
         <div className="hidden md:flex items-center gap-4">
