@@ -6,12 +6,17 @@ import { textVariants } from "./Text";
 const LinkButton = ({
   href,
   children,
+  className,
 }: {
   href: string;
   children: React.ReactNode;
+  className?: string;
 }) => {
   return (
-    <Link href={href} className="text-primary flex items-center gap-4">
+    <Link
+      href={href}
+      className={`text-primary flex items-center gap-4 ${className}`}
+    >
       <span
         className={cn(
           textVariants({

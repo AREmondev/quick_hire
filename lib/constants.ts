@@ -1,6 +1,7 @@
 export const IMAGES = {
   // SHOWCASE: "/assets/images/logo.png",
   LOGO: "/assets/images/logo.png",
+  LOGO_WHITE: "/assets/images/logo_white.svg",
   HERO_PATTERN: "/assets/images/hero-pattern.png",
   HERO_IMAGE: "/assets/images/hero.png",
   COMPANY_LOGO_1: "/assets/images/company_logo_1.png",
@@ -28,4 +29,9 @@ export const IMAGES = {
       name: "talkit",
     },
   ],
+  FACEBOOK: "/assets/images/Facebook.svg",
+  TWITTER: "/assets/images/Twitter.svg",
+  LINKEDIN: "/assets/images/LinkedIn.svg",
+  INSTAGRAM: "/assets/images/Instagram.svg",
+  DRIBBL: "/assets/images/Dribbble.svg",
 };
