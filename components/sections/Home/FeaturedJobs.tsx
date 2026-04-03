@@ -23,9 +23,11 @@ const FeaturedJobs = async () => {
               Show all jobs
             </LinkButton>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="flex -mx-4 px-4 overflow-x-auto pb-4 sm:pb-0 sm:mx-0 sm:px-0 sm:overflow-visible snap-x snap-mandatory scrollbar-hide flex-nowrap sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {jobs?.items.map((job, index) => (
-              <JobCard job={job} key={index} />
+              <div key={index} className="min-w-[300px] sm:min-w-0 snap-center">
+                <JobCard job={job} />
+              </div>
             ))}
           </div>
           <LinkButton className="flex sm:hidden" href="/jobs">
