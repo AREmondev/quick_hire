@@ -19,7 +19,7 @@ const FeaturedJobs = async () => {
             <Text variant={"h2"} fontFamily={"clash"}>
               Featured <span className="text-accent-blue">jobs</span>
             </Text>
-            <LinkButton className="hidden sm:block" href="/jobs">
+            <LinkButton className="hidden sm:flex" href="/jobs">
               Show all jobs
             </LinkButton>
           </div>
@@ -28,7 +28,7 @@ const FeaturedJobs = async () => {
               <JobCard job={job} key={index} />
             ))}
           </div>
-          <LinkButton className="block sm:hidden" href="/jobs">
+          <LinkButton className="flex sm:hidden" href="/jobs">
             Show all jobs
           </LinkButton>
         </div>

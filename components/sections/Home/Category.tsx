@@ -43,7 +43,7 @@ const Category = async () => {
             <Text variant={"h2"} fontFamily={"clash"}>
               Explore by <span className="text-accent-blue">category</span>
             </Text>
-            <LinkButton className="hidden sm:block" href="/jobs">
+            <LinkButton className="hidden sm:flex" href="/jobs">
               Show all jobs
             </LinkButton>
           </div>
@@ -52,7 +52,7 @@ const Category = async () => {
               <CtgCard key={item.id} category={item} />
             ))}
           </div>
-          <LinkButton className="block sm:hidden" href="/jobs">
+          <LinkButton className="flex sm:hidden" href="/jobs">
             Show all jobs
           </LinkButton>
         </div>

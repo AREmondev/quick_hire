@@ -20,7 +20,7 @@ const LatestJobs = async () => {
             <Text variant={"h2"} fontFamily={"clash"}>
               Latest <span className="text-accent-blue">jobs</span>
             </Text>
-            <LinkButton className="hidden sm:block" href="/jobs">
+            <LinkButton className="hidden sm:flex" href="/jobs">
               Show all jobs df
             </LinkButton>
           </div>
@@ -91,7 +91,7 @@ const LatestJobs = async () => {
               </Link>
             ))}
           </div>
-          <LinkButton className="block sm:hidden" href="/jobs">
+          <LinkButton className="flex sm:hidden" href="/jobs">
             Show all jobs
           </LinkButton>
         </div>
