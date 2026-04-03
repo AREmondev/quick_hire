@@ -21,7 +21,7 @@ const LatestJobs = async () => {
               Latest <span className="text-accent-blue">jobs</span>
             </Text>
             <LinkButton className="hidden sm:flex" href="/jobs">
-              Show all jobs df
+              show all jobs
             </LinkButton>
           </div>
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-y-4 gap-x-8">
