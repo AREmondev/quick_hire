@@ -7,7 +7,10 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token }) => {
+        // Only allow candidates who are logged in
+        return !!token && token.user?.role === "candidate";
+      },
     },
     pages: {
       signIn: "/auth/login",

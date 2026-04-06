@@ -21,6 +21,12 @@ export const authConfig: AuthOptions = {
         if (!credentials) return null;
         const { email, password } = credentials;
         const { user, tokens } = await login(email, password);
+
+        // Check if user is a candidate
+        if (user.role !== "candidate") {
+          throw new Error("Only candidates are allowed to log in to this portal.");
+        }
+
         // console.log("Login", user, tokens);
         return {
           id: user.id,

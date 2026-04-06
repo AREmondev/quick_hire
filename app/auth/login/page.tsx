@@ -35,7 +35,13 @@ export default function LoginPage() {
         });
 
         if (result?.error) {
-          throw new Error(result.error);
+          // In NextAuth v4 with credentials, throwing an Error in authorize
+          // results in result.error being a string, but often just "CredentialsSignin"
+          // We can check if the error is exactly what we threw or handle it generally
+          if (result.error === "Only candidates are allowed to log in to this portal.") {
+            throw new Error(result.error);
+          }
+          throw new Error("Invalid credentials or access restricted.");
         }
       } catch (err) {
         throw err;
